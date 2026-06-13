@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settlement Scout</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>⚖️ Settlement Scout</h1>
+    <p class="tag">Find the class-action &amp; refund settlements you qualify for — match, plan, draft. <em>Informational only, not legal advice.</em></p>
+  </header>
+
+  <main>
+    <section id="summary" class="card"><h2>Your action plan</h2><div id="plan">Loading…</div></section>
+
+    <section class="card">
+      <h2>Matches</h2>
+      <div id="matches">Loading…</div>
+    </section>
+
+    <section class="card">
+      <h2>Your profile <small>(edit JSON, then Save)</small></h2>
+      <textarea id="profile" spellcheck="false" rows="16"></textarea>
+      <button id="save">Save profile &amp; re-match</button>
+      <span id="saved"></span>
+    </section>
+
+    <section class="card">
+      <h2>Draft outreach</h2>
+      <label>Settlement <select id="d-settlement"></select></label>
+      <label>Kind
+        <select id="d-kind">
+          <option value="claim_inquiry">Claim membership inquiry</option>
+          <option value="records_request">Records request</option>
+        </select>
+      </label>
+      <label>Channel
+        <select id="d-channel"><option value="email">Email</option><option value="letter">Letter</option></select>
+      </label>
+      <button id="d-go">Generate draft</button>
+      <pre id="draft"></pre>
+    </section>
+  </main>
+  <footer>Always confirm eligibility &amp; deadlines on the official settlement site before filing. Drafts are never auto-sent.</footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

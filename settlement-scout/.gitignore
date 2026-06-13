@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+data/scout.db
+data/profile.json
+exports/
+.venv/

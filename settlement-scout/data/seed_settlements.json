@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "description": "Curated seed of active/recent U.S. class-action and regulatory settlements. Each record carries STRUCTURED eligibility criteria the matching engine can evaluate against a user profile. Always verify against the official settlement website before filing.",
+    "last_curated": "2026-06-13",
+    "disclaimer": "Informational only. Not legal advice. Deadlines and terms change; confirm on the official site."
+  },
+  "settlements": [
+    {
+      "id": "invitation-homes-ftc-2025",
+      "title": "Invitation Homes FTC Junk-Fee Refund",
+      "defendant": "Invitation Homes Inc.",
+      "category": "rental_housing",
+      "kind": "ftc_redress",
+      "summary": "FTC is mailing $47.2M to ~444,131 renters charged undisclosed/excessive fees. Automatic refund – no claim form required for most.",
+      "claim_required": false,
+      "auto_payment": true,
+      "estimated_payout_usd": [50, 200],
+      "claim_deadline": null,
+      "final_approval_hearing": null,
+      "official_url": "https://www.ftc.gov/enforcement/refunds/invitation-homes-settlement",
+      "sources": [
+        "https://www.ftc.gov/enforcement/refunds/invitation-homes-settlement",
+        "https://getoutofdebt.org/244710/invitation-homes-settlement-refund"
+      ],
+      "eligibility": [
+        {"field": "landlords", "op": "overlaps_dates", "value": "Invitation Homes", "date_range": ["2021-01-01", "2024-09-30"], "required": true, "label": "Rented from Invitation Homes between Jan 2021 and Sep 2024"}
+      ],
+      "action_notes": "Most eligible renters receive a check automatically. If you moved, update your address with the FTC refund administrator. Watch for a check; do not pay anyone to 'release' it."
+    },
+    {
+      "id": "invitation-homes-mn-lease-credit-2026",
+      "title": "Invitation Homes Minnesota Lease-Credit / Maintenance Settlement",
+      "defendant": "Invitation Homes (Minnesota affiliates)",
+      "category": "rental_housing",
+      "kind": "class_action",
+      "summary": "Covers MN renters who performed maintenance without compensation, 7/12/2015–7/12/2021. Members may elect debt relief or cash.",
+      "claim_required": true,
+      "auto_payment": false,
+      "estimated_payout_usd": [100, 500],
+      "claim_deadline": "2026-02-10",
+      "final_approval_hearing": "2026-04-06",
+      "official_url": "https://www.mninvitationhomessettlement.com/",
+      "sources": [
+        "https://www.mninvitationhomessettlement.com/",
+        "https://topclassactions.com/lawsuit-settlements/closed-settlements/invitation-homes-lease-credit-class-action-settlement/"
+      ],
+      "eligibility": [
+        {"field": "landlords", "op": "overlaps_dates", "value": "Invitation Homes", "date_range": ["2015-07-12", "2021-07-12"], "required": true, "label": "Rented from Invitation Homes between Jul 12 2015 and Jul 12 2021"},
+        {"field": "states", "op": "state_in", "value": "MN", "required": true, "label": "Residence was in Minnesota"}
+      ],
+      "action_notes": "Submit claim online or postmarked by 2026-02-10. Decide debt-relief vs. cash. Keep proof of tenancy and any maintenance you performed."
+    },
+    {
+      "id": "cashapp-tcpa-wa-2025",
+      "title": "Cash App 'Invite Friends' Spam-Text (TCPA) Settlement",
+      "defendant": "Block, Inc. (Cash App)",
+      "category": "consumer_privacy",
+      "kind": "class_action",
+      "summary": "$12.5M settlement for Washington consumers who received unsolicited Cash App invite texts over ~6 years. Est. $88–$147 per claimant.",
+      "claim_required": true,
+      "auto_payment": false,
+      "estimated_payout_usd": [88, 147],
+      "claim_deadline": "2025-10-27",
+      "final_approval_hearing": null,
+      "official_url": "https://www.classaction.org/news/12.5m-cash-app-settlement-aims-to-resolve-lawsuit-over-alleged-invite-friends-spam-texts",
+      "sources": [
+        "https://www.classaction.org/news/12.5m-cash-app-settlement-aims-to-resolve-lawsuit-over-alleged-invite-friends-spam-texts",
+        "https://www.paymentsdive.com/news/cash-app-spam-settlement-approved/806903/"
+      ],
+      "eligibility": [
+        {"field": "apps", "op": "overlaps_dates", "value": "Cash App", "date_range": ["2018-01-01", "2024-12-31"], "required": true, "label": "Received Cash App invite texts (WA)"},
+        {"field": "states", "op": "state_in", "value": "WA", "required": false, "label": "Washington resident (class scope)"}
+      ],
+      "action_notes": "Claim window for this WA settlement has closed (2025-10-27). Logged for reference and to detect similar TCPA settlements you may qualify for next."
+    },
+    {
+      "id": "tcpa-robotext-generic-watch",
+      "title": "Generic TCPA Robotext / Robocall Settlements (Watchlist)",
+      "defendant": "Various",
+      "category": "consumer_privacy",
+      "kind": "watchlist",
+      "summary": "Recurring settlements for unsolicited marketing texts/calls. New ones open regularly; this is a watch rule that flags you as a likely class member.",
+      "claim_required": true,
+      "auto_payment": false,
+      "estimated_payout_usd": [25, 150],
+      "claim_deadline": null,
+      "final_approval_hearing": null,
+      "official_url": "https://www.classaction.org/",
+      "sources": ["https://www.classaction.org/"],
+      "eligibility": [
+        {"field": "flags", "op": "has", "value": "received_spam_texts", "required": true, "label": "You receive unsolicited marketing texts/calls"}
+      ],
+      "action_notes": "Keep screenshots of spam texts with sender + date. They are evidence for TCPA claims ($500–$1,500 per willful violation in some cases)."
+    },
+    {
+      "id": "data-breach-generic-watch",
+      "title": "Data-Breach Settlements (Watchlist)",
+      "defendant": "Various",
+      "category": "data_breach",
+      "kind": "watchlist",
+      "summary": "If your data was exposed in a breach (notified by letter/email), you are often a class member with cash + credit-monitoring options.",
+      "claim_required": true,
+      "auto_payment": false,
+      "estimated_payout_usd": [25, 5000],
+      "claim_deadline": null,
+      "final_approval_hearing": null,
+      "official_url": "https://www.classaction.org/data-breach-lawsuits",
+      "sources": ["https://www.classaction.org/data-breach-lawsuits"],
+      "eligibility": [
+        {"field": "data_breaches", "op": "any", "required": true, "label": "You received a data-breach notification"}
+      ],
+      "action_notes": "Keep every breach-notification letter/email. Document any fraud, time spent, and out-of-pocket losses to claim the higher tier."
+    }
+  ]
+}

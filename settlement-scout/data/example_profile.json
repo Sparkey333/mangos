@@ -1,0 +1,26 @@
+{
+  "name": "Brandon Example",
+  "email": "you@example.com",
+  "phone": "555-0100",
+  "address": "123 Main St, Minneapolis, MN 55401",
+  "states": [
+    {"state": "MN", "from": "2016-03-01", "to": "2020-11-30"},
+    {"state": "AZ", "from": "2021-02-01", "to": "2023-09-01"}
+  ],
+  "landlords": [
+    {"name": "Invitation Homes", "from": "2021-02-01", "to": "2023-09-01", "state": "AZ"},
+    {"name": "Invitation Homes", "from": "2017-01-01", "to": "2019-12-31", "state": "MN"}
+  ],
+  "apps": [
+    {"name": "Cash App", "from": "2019-01-01", "to": "2024-06-01"}
+  ],
+  "banks": [],
+  "purchases": [],
+  "data_breaches": [
+    {"org": "Example Retailer", "date": "2024-08-01"}
+  ],
+  "employers": [],
+  "carriers": ["Verizon"],
+  "devices": [],
+  "flags": ["received_spam_texts"]
+}
