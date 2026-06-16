@@ -1,0 +1,16 @@
+# Local data store — never commit your personal biometric data or downloads
+.conlab/
+*.sqlite3
+data/
+documents/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
