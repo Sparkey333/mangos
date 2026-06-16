@@ -238,9 +238,18 @@
 
   function onVictory() {
     Audio7.spectrum(THE_SEVEN.map((h) => h.toneHz));
+    const unity = THE_HIDDEN.find((h) => h.key === "unity");
+    const ninth = THE_HIDDEN.find((h) => h.key === "ouroboros");
+    const voidT = THE_HIDDEN.find((h) => h.key === "void");
     $("#end-title").textContent = "THE SPECTRUM CLOSES";
+    $("#end-title").style.color = "#fff";
     $("#end-msg").textContent =
-      `${player.name} carried all seven rays to the capstone. The seven tones ring as one — and the light turns white.`;
+      `${player.name} carried all seven rays to the capstone. The seven tones ring as one — and for a moment they are not seven but ${unity.name}, the Eighth: a single living light.`;
+    // a whisper of what waits beyond the seven
+    $("#end-whisper").textContent =
+      `…beneath it the ${ninth.name} stirs — the tail-eater, the dark cycle that must be ridden. ` +
+      `And further out, past light and dark alike, ${voidT.name} forgets. ` +
+      `One grain, named and remembered, holds it all open.`;
     show("end");
     busy = false;
   }

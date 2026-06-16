@@ -57,6 +57,11 @@ body {
   box-shadow: 0 0 16px rgba(154,63,214,.5);
 }
 .pitch { color: var(--ink); opacity: .9; line-height: 1.5; font-size: 14px; }
+.whisper {
+  color: #6f63a0; font-size: 12.5px; line-height: 1.6; font-style: italic;
+  max-width: 460px; border-top: 1px dashed var(--line); padding-top: 12px;
+  letter-spacing: .3px;
+}
 .hint { color: var(--dim); font-size: 12px; line-height: 1.5; }
 
 /* ---------- buttons ---------- */

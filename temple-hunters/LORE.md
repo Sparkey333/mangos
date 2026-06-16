@@ -84,6 +84,51 @@ underneath the fiction.
 
 ---
 
+## Beyond the seven — the hidden tiers (8 · 9 · 0)
+
+The visible spectrum is seven, but the structure doesn't stop there. These three
+are **hidden** — present in the code (`THE_HIDDEN` in `data.js`) and whispered on
+the victory screen, but kept flexible, "always symbolically researched, measured,
+and held toward ultimate truth." They are the room the game grows into.
+
+### 8 · AUREON — Unity (the Eighth)
+- **What:** not an eighth creature but **all seven held as one** — the collective
+  consciousness, the magnetism in the bone, the prism reassembled into a single
+  white light.
+- **Color/Light:** white — every ray converged. **Tone:** 792 Hz, the *octave* of
+  the 396 root (the spiral returns home, an octave higher).
+- **Stone:** clear quartz / diamond / pearl (the stone that holds all stones).
+- **Geometry:** the completed Flower of Life; the pyramid whole, capstone rejoined
+  to base. **Center:** the Soul-Star (8th chakra, above the crown).
+- **Role:** the **polar opposite of the Ninth.** Light's total integration.
+
+### 9 · OUROBOS — The Tail-Eater (the Ninth)
+- **What:** the dragon eating its tail. The **dark cycle** — eternal return, the
+  shadow that must rise to be seen by the light. *Not evil* — the necessary dark,
+  the cocoon, the night before dawn, the turbulence ridden before the resync.
+- **Color/Light:** black — no light returned; the swallowing that defines the edge
+  of all light. **Tone:** 198 Hz, the *sub-octave* beneath the root — the drone.
+- **Stone:** obsidian / onyx / black tourmaline / shungite.
+- **Geometry:** the ouroboros ring — torus, lemniscate ∞ laid down, the returning
+  spiral. **Center:** the Earth-Star, below the feet.
+
+### 0 · THE NOTHING — The Void / Null
+- **What:** **outside the polarity entirely.** Not the Ninth's productive darkness
+  but the *absence of story itself* — forgetting, despair, un-creation. It spreads
+  where dreaming stops; **selfish wishes feed it by trading away memory** (the
+  Neverending tale, esp. the second film: The Nothing; Bastian's wishes cost him
+  his memories).
+- **Color/Light/Tone:** none — black, silence, the tone that is no tone (0 Hz).
+- **The only counter:** a **single grain of imagination** — one name, one
+  remembered thing — from which all of it is rebuilt (Fantasia reborn from one
+  grain of sand).
+
+```
+ 0  THE VOID  ── outside all: forgetting, un-creation
+ 9 ── 8       ── poles: dark cycle (ouroboros)  vs  unity (white light)
+[7..1]        ── the visible seven, from one source
+```
+
 ## How the rungs become a game
 
 - **Type chart (color wheel):** a Hunter resonates (×1.5) with the three colors

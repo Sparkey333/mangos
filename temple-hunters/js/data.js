@@ -163,12 +163,80 @@ const THE_SEVEN = [
 ];
 
 /* Type chart — the color wheel as a balanced cycle.
- * Each Hunter is strong against the three colors that follow it around the
- * rainbow, and weak to the three behind it. Mirror match is neutral. */
+ * Each Hunter is strong against the color 3 steps ahead and weak to 3 behind. */
 function effectiveness(attackerId, defenderId) {
   if (attackerId === defenderId) return 1.0;
   const fwd = ((defenderId - attackerId) + 7) % 7; // 1..6
   return (fwd >= 1 && fwd <= 3) ? 1.5 : 0.75;
 }
 
-if (typeof module !== "undefined") module.exports = { THE_SEVEN, effectiveness };
+/* ============================================================================
+ * THE HIDDEN TIERS — 8, 9, and the Void.
+ *
+ * The seven are the visible spectrum. Beyond them the structure keeps going,
+ * hidden yet always there to be researched, measured, and held loosely toward
+ * the truth. These are NOT in the roster. They surface only as whispers (for
+ * now) — the design space the whole game eventually grows into.
+ *
+ *   8 — UNITY      : all seven held as one. White light. The octave. ∞ upright.
+ *   9 — OUROBOROS  : the dragon eating its tail. The dark cycle, eternal return,
+ *                    the shadow that must rise to be seen by the light.
+ *   0 — THE VOID   : the Nothing. Outside polarity entirely. Forgetting,
+ *                    un-creation — and the single grain that rebuilds it all.
+ * ========================================================================== */
+const THE_HIDDEN = [
+  {
+    glyph: "8", key: "unity",
+    name: "AUREON", title: "The Eighth — Unity",
+    base: "#ffffff", shade: "#cfc4ff", light: "#ffffff", gem: "#bfa8ff",
+    chakra: "Soul Star — the 8th center, above the crown",
+    light_: "Full-spectrum white — all seven rays converged",
+    toneHz: 792,            // octave of the 396 root: the spiral returns home, higher
+    note: "G (octave)",
+    stone: "Clear Quartz / Diamond / Pearl (the stone that holds all stones)",
+    geometry: "The completed Flower of Life — the pyramid whole, base rejoined to capstone",
+    meaning:
+      "Not an eighth creature but the seven remembered as one organism — the " +
+      "collective consciousness, magnetism in the bone, the prism reassembled " +
+      "into a single living light. The polar opposite of the Ninth.",
+    blurb: "When the seven stop holding the weight separately and become one, the spectrum closes to white."
+  },
+  {
+    glyph: "9", key: "ouroboros",
+    name: "OUROBOS", title: "The Ninth — The Tail-Eater",
+    base: "#0c0a14", shade: "#1a1530", light: "#3a2f5e", gem: "#5e1f96",
+    chakra: "Earth Star — below the feet, the root of the root",
+    light_: "No light returned — the swallowing dark that defines the edge of all light",
+    toneHz: 198,            // sub-octave below the 396 root: the drone beneath
+    note: "G (sub-octave)",
+    stone: "Obsidian / Onyx / Black Tourmaline / Shungite",
+    geometry: "The Ouroboros ring — the torus, the lemniscate ∞ laid down, the spiral that returns",
+    meaning:
+      "The dragon eating its tail. Not evil — the necessary dark, the cocoon, " +
+      "the night before dawn, eternal return. The turbulence you ride before " +
+      "the resync. All shadow either rises into the light or is blinded by it.",
+    blurb: "The cycle that must be ridden. Darkness that exists so the night can finally see the Light."
+  },
+  {
+    glyph: "0", key: "void",
+    name: "THE NOTHING", title: "The Void — Null",
+    base: "#000000", shade: "#000000", light: "#0a0a0a", gem: "#101010",
+    chakra: "None — the absence of center",
+    light_: "Neither light nor dark — the un-being that erases the question itself",
+    toneHz: 0,             // silence. the tone that is no tone.
+    note: "— (silence)",
+    stone: "None — the stone that was never quarried",
+    geometry: "Null — outside the spiral, outside the ring, outside the seven",
+    meaning:
+      "Not the Ninth's productive darkness but the absence of story itself — " +
+      "forgetting, despair, the un-creation. It spreads where dreaming stops; " +
+      "selfish wishes feed it by trading away memory. (The Nothing, of the " +
+      "Neverending tale.) Its only answer is a single grain of imagination — " +
+      "one name, one remembered thing — from which all of it is rebuilt.",
+    blurb: "The Emptiness that forgets. A single grain of sand, named and remembered, undoes it."
+  }
+];
+
+if (typeof module !== "undefined") module.exports = { THE_SEVEN, THE_HIDDEN, effectiveness };
+if (typeof window !== "undefined") { window.THE_SEVEN = THE_SEVEN; window.THE_HIDDEN = THE_HIDDEN; }
+
