@@ -1,0 +1,14 @@
+{
+  "name": "Temple Hunters — Prism Ascent",
+  "short_name": "Temple Hunters",
+  "description": "Seven pixel creatures, one per rainbow color, each carrying a layer of the unified theory of color, frequency, sound, stone and sacred geometry. Climb the seven layers of the pyramid.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0712",
+  "theme_color": "#0a0712",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
