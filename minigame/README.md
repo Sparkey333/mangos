@@ -14,9 +14,15 @@ Just open `index.html` in any modern browser. No build step, no dependencies.
 - **Move:** Arrow keys / `WASD`, or click-and-drag (touch supported on mobile).
 - **Collect** the friendly creatures for points:
   - 🐠 Clownfish — +10
+  - 🌊 Seahorse — +12
   - ⭐ Starfish — +15
   - 🐚 Seashell — +20
-- **Dodge** the hazards (each hit costs a life — you have 3):
+- **Chain** pickups without getting hit to build a **combo multiplier**
+  (up to ×5) — every point you bank is multiplied by it.
+- **Grab a 🫧 pearl** for a 6-second **shield**. While shielded you're
+  invincible and *zap* hazards for bonus points instead of taking damage.
+- **Dodge** the hazards (each hit costs a life — you have 3, and breaks
+  your combo):
   - 🪼 Jellyfish · 🐡 Pufferfish · 🦀 Crab · 🦑 Squid
 - The current swim speed ramps up the longer you survive. High score is
   saved in `localStorage`.

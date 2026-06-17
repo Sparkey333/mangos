@@ -2,35 +2,44 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Ocean Dive" />
+<meta name="theme-color" content="#0a2942" />
 <title>Bit Claude's Ocean Dive 🌊</title>
 <style>
   :root { --sea:#0a2942; --sea2:#12476e; }
   * { box-sizing:border-box; }
   html,body {
-    margin:0; height:100%;
+    margin:0; height:100%; min-height:100dvh;
     background:radial-gradient(120% 120% at 50% 0%, #1b6ea0 0%, var(--sea2) 45%, var(--sea) 100%);
     font-family:"Courier New",monospace; color:#dff6ff; overflow:hidden;
     -webkit-user-select:none; user-select:none; touch-action:none;
+    -webkit-touch-callout:none; overscroll-behavior:none;
   }
   #wrap {
-    position:absolute; inset:0; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:10px; padding:10px;
+    position:fixed; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px;
+    padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 8px);
   }
-  h1 { margin:0; font-size:clamp(18px,4vw,28px); letter-spacing:1px;
-       text-shadow:0 2px 0 #04304a; }
+  h1 { margin:0; font-size:clamp(17px,4vw,28px); letter-spacing:1px;
+       text-shadow:0 2px 0 #04304a; text-align:center; }
   #stage {
-    position:relative; width:min(96vw, 88vh*16/9);
-    aspect-ratio:16/9; max-height:88vh;
+    position:relative; width:min(96vw, 86vh*16/9);
+    aspect-ratio:16/9; max-height:80dvh;
     border:3px solid #0a4d5e; border-radius:8px;
     box-shadow:0 0 0 3px #062633, 0 12px 40px rgba(0,0,0,.5);
     background:#0a3550; overflow:hidden;
   }
   canvas {
     width:100%; height:100%; display:block;
-    image-rendering:pixelated; image-rendering:crisp-edges;
+    image-rendering:crisp-edges;
+    image-rendering:pixelated;            /* keep last: wins where supported */
   }
-  .hint { font-size:clamp(11px,2.4vw,14px); opacity:.85; text-align:center; }
+  .hint { font-size:clamp(11px,2.4vw,14px); opacity:.85; text-align:center;
+          max-width:560px; line-height:1.5; }
   .tag { color:#5fe0e0; }
 </style>
 </head>
@@ -39,9 +48,9 @@
   <h1>🌊 Bit Claude's Ocean Dive 🐠</h1>
   <div id="stage"><canvas id="c" width="320" height="180"></canvas></div>
   <div class="hint">
-    <span class="tag">Move:</span> Arrows / WASD / drag &nbsp;·&nbsp;
-    <span class="tag">Collect</span> fish, starfish &amp; shells &nbsp;·&nbsp;
-    <span class="tag">Dodge</span> jellyfish, pufferfish, crabs &amp; squid
+    <span class="tag">Move:</span> drag / Arrows / WASD &nbsp;·&nbsp;
+    <span class="tag">Grab</span> fish ⭐ shells 🐚 + 🫧 pearls (shield!) &nbsp;·&nbsp;
+    <span class="tag">Dodge</span> 🪼 🐡 🦀 🦑 &nbsp;·&nbsp; chain grabs for combos
   </div>
 </div>
 
@@ -60,7 +69,7 @@ const W = cv.width, H = cv.height;
 
 /* ---------- pixel-art sprite system ----------
    Each sprite is an array of equal-ish rows of chars.
-   '.' = transparent. Other chars map to colors via a palette.
+   '.' / ' ' = transparent. Other chars map to colors via palette.
    Rows are normalized so ragged art can't break rendering. */
 function makeSprite(rows, palette) {
   const w = Math.max(...rows.map(r => r.length));
@@ -72,8 +81,7 @@ function drawSprite(spr, dx, dy, scale, flip) {
   for (let y = 0; y < h; y++) {
     const row = rows[y];
     for (let x = 0; x < w; x++) {
-      const ch = row[x];
-      const col = palette[ch];
+      const col = palette[row[x]];
       if (!col) continue;
       const px = flip ? (w - 1 - x) : x;
       ctx.fillStyle = col;
@@ -86,14 +94,8 @@ function drawSprite(spr, dx, dy, scale, flip) {
    The classic Claude blob, retinted from terracotta to ocean aqua,
    wearing a little dive mask. */
 const claudePal = {
-  o:"#063a44", // dark outline
-  b:"#33c9c9", // body aqua
-  l:"#8af1ec", // highlight
-  g:"#0d6a7a", // mask frame
-  s:"#bdfcff", // mask glass / shine
-  w:"#ffffff", // eye white
-  k:"#06343c", // pupil
-  m:"#0a4a52"  // smile
+  o:"#063a44", b:"#33c9c9", l:"#8af1ec", g:"#0d6a7a",
+  s:"#bdfcff", w:"#ffffff", k:"#06343c", m:"#0a4a52"
 };
 const claude = makeSprite([
   "....oooooo....",
@@ -102,7 +104,7 @@ const claude = makeSprite([
   "obbbbbbbbbblo",
   "obggggggggggo",
   "obgswwgswwsgo",
-  "obgswkgswks go",
+  "obgswkgswksgo",
   "obgsswgsswsgo",
   "obggggggggggo",
   "obbbbbbbbbbbo",
@@ -110,10 +112,10 @@ const claude = makeSprite([
   ".obbbmmmmbbo.",
   "..obbbbbbbo..",
   "...oobbboo...",
-  ".....oo o....",
+  ".....oo.o....",
 ], claudePal);
 
-/* ---------- Sea creatures (collectibles, +points) ---------- */
+/* ---------- collectible sea creatures (+points) ---------- */
 const clownfish = makeSprite([
   "....oooo....",
   "..oobbbboo..",
@@ -135,7 +137,7 @@ const starfish = makeSprite([
   ".ooollllooo.",
   "..ollllllo..",
   ".olllooollo.",
-  "ollo o oollo",
+  "ollo.o.oollo",
   "oo........oo",
 ], {o:"#b07000", l:"#ffd23f"});
 
@@ -150,7 +152,34 @@ const shell = makeSprite([
   "...oooooo...",
 ], {o:"#7a2350", p:"#ff8fc4", r:"#ffc2dd", w:"#fff0f7"});
 
-/* ---------- Hazards (avoid, costs a life) ---------- */
+const seahorse = makeSprite([
+  "..oooo..",
+  ".obbbho.",
+  "oobbbbho",
+  "kobbbbo.",
+  ".obbbbo.",
+  "..obbbo.",
+  "...obbo.",
+  "..obbbo.",
+  ".obbbo..",
+  ".obbo...",
+  ".obbbo..",
+  "..oooo..",
+], {o:"#9a5a00", b:"#ffc34d", h:"#fff0c0", k:"#2a2a2a"});
+
+/* ---------- power-up: pearl (grants a shield) ---------- */
+const pearl = makeSprite([
+  "..oooo..",
+  ".owwllo.",
+  "owwlllwo",
+  "owlllllo",
+  "owlllllo",
+  "owlllwwo",
+  ".ollwwo.",
+  "..oooo..",
+], {o:"#7fc6d6", w:"#ffffff", l:"#d9f3ff"});
+
+/* ---------- hazards (avoid, costs a life) ---------- */
 const jellyfish = makeSprite([
   "...oooooo...",
   "..opppppppo.",
@@ -167,12 +196,12 @@ const jellyfish = makeSprite([
 const puffer = makeSprite([
   "..k..oo..k..",
   "k.kooooook.k",
-  ".kogggggok.",
+  ".kogggggok..",
   "kogggwggggok",
   "oggwkggggggo",
   "oggggggwkggo",
   "kogggggwggok",
-  ".kogggggok.",
+  ".kogggggok..",
   "k.kooooook.k",
   "..k..oo..k..",
 ], {o:"#1d5a1d", g:"#5fcb4a", w:"#eafff0", k:"#103a10"});
@@ -202,7 +231,7 @@ const squid = makeSprite([
   "o..o...o..",
 ], {o:"#5a0a45", m:"#e64bb0", w:"#fff0fa", k:"#3a0530"});
 
-/* ---------- decorative background bits ---------- */
+/* ---------- decorative ---------- */
 const seaweed = makeSprite([
   ".g.",".gg","gg.",".gg",".g.","gg.",".gg",".g.","gg.",".g.","ggg"
 ], {g:"#0e7a52"});
@@ -213,59 +242,85 @@ const seaweed = makeSprite([
 const GOOD = [
   { spr: clownfish, score: 10 },
   { spr: starfish,  score: 15 },
+  { spr: seahorse,  score: 12 },
   { spr: shell,     score: 20 },
 ];
 const BAD = [
   { spr: jellyfish }, { spr: puffer }, { spr: crab }, { spr: squid },
 ];
+const PEARL = { spr: pearl, score: 25 };
 
 /* ============================================================
    Game state
    ============================================================ */
-const SCALE = 2;                 // sprite pixel scale on the 320x180 canvas
+const SCALE = 2;
 const player = {
   x: 40, y: H/2, w: claude.w*SCALE, h: claude.h*SCALE,
   vx:0, vy:0, flip:false, bobT:0, hurt:0
 };
-let entities = [];   // active creatures
-let bubbles = [];    // ambient bubbles
-let weeds = [];      // background seaweed
-let score = 0, lives = 3, best = +(localStorage.getItem("bitClaudeOceanBest")||0);
-let spawnT = 0, speed = 60, elapsed = 0;
+let entities = [], bubbles = [], weeds = [];
+let score = 0, lives = 3, combo = 0, shield = 0;
+let best = loadBest();
+let isNewBest = false;
+let spawnT = 0, speed = 60, elapsed = 0, shake = 0;
 let state = "title"; // title | play | over
-let shake = 0;
+
+function loadBest(){ try { return +(localStorage.getItem("bitClaudeOceanBest")||0)||0; } catch(e){ return 0; } }
+function saveBest(v){ try { localStorage.setItem("bitClaudeOceanBest", v); } catch(e){} }
+function comboMult(){ return Math.min(1 + Math.floor(combo/4), 5); }
 
 /* ---------- input ---------- */
 const keys = {};
 addEventListener("keydown", e => {
-  keys[e.key.toLowerCase()] = true;
-  if ([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(e.key.toLowerCase())) e.preventDefault();
-  if (state !== "play" && (e.key===" "||e.key==="Enter")) startGame();
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if ([" ","arrowup","arrowdown","arrowleft","arrowright"].includes(k)) e.preventDefault();
+  unlockAudio();
+  if (state !== "play" && (k===" "||k==="enter")) startGame();
 });
 addEventListener("keyup", e => { keys[e.key.toLowerCase()] = false; });
 
-// pointer / touch drag
-let drag = null;
+// pointer / touch drag (works for mouse + touch)
+let drag = null, pointerDownNow = false, ignoreThisDrag = false;
 function toCanvas(ev){
   const r = cv.getBoundingClientRect();
   const p = ev.touches ? ev.touches[0] : ev;
+  if (!p) return drag;                       // empty touch list (multi-touch lift) -> keep last
   return { x:(p.clientX-r.left)/r.width*W, y:(p.clientY-r.top)/r.height*H };
 }
-function pointerDown(ev){ if(state!=="play"){ startGame(); } drag = toCanvas(ev); ev.preventDefault(); }
-function pointerMove(ev){ if(drag) drag = toCanvas(ev); ev.preventDefault(); }
-function pointerUp(){ drag = null; }
+function pointerDown(ev){
+  unlockAudio();
+  pointerDownNow = true;
+  if (state !== "play"){ startGame(); ignoreThisDrag = true; drag = null; } // start tap shouldn't yank the diver
+  else { ignoreThisDrag = false; drag = toCanvas(ev); }
+  ev.preventDefault();
+}
+function pointerMove(ev){
+  if (!pointerDownNow) return;
+  ignoreThisDrag = false;                     // first move after a start-tap engages control
+  drag = toCanvas(ev);
+  ev.preventDefault();
+}
+function pointerUp(){ pointerDownNow = false; ignoreThisDrag = false; drag = null; }
 cv.addEventListener("mousedown", pointerDown);
-cv.addEventListener("mousemove", pointerMove);
+addEventListener("mousemove", pointerMove);
 addEventListener("mouseup", pointerUp);
 cv.addEventListener("touchstart", pointerDown, {passive:false});
-cv.addEventListener("touchmove", pointerMove, {passive:false});
+addEventListener("touchmove", pointerMove, {passive:false});
 addEventListener("touchend", pointerUp);
+addEventListener("touchcancel", pointerUp);
 
-/* ---------- audio (tiny WebAudio blips) ---------- */
+/* ---------- audio (tiny WebAudio blips; iOS-safe unlock) ---------- */
 let AC = null;
-function beep(freq, dur, type, vol){
+function unlockAudio(){
   try{
     AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    if (AC.state === "suspended") AC.resume();
+  }catch(e){}
+}
+function beep(freq, dur, type, vol){
+  if(!AC) return;
+  try{
     const o = AC.createOscillator(), g = AC.createGain();
     o.type = type||"square"; o.frequency.value = freq;
     g.gain.value = vol||0.06;
@@ -275,70 +330,72 @@ function beep(freq, dur, type, vol){
     o.stop(AC.currentTime + (dur||0.12));
   }catch(e){}
 }
-const sGood = ()=>{ beep(660,0.08,"square",0.05); setTimeout(()=>beep(990,0.1,"square",0.05),60); };
-const sHit  = ()=>{ beep(150,0.25,"sawtooth",0.08); };
-const sOver = ()=>{ beep(330,0.15,"square",0.06); setTimeout(()=>beep(220,0.2,"square",0.06),120); setTimeout(()=>beep(140,0.3,"square",0.06),260); };
+const sGood  = ()=>{ beep(660,0.08,"square",0.05); setTimeout(()=>beep(990,0.1,"square",0.05),55); };
+const sPearl = ()=>{ beep(880,0.08,"triangle",0.06); setTimeout(()=>beep(1320,0.12,"triangle",0.06),70); setTimeout(()=>beep(1760,0.14,"triangle",0.05),150); };
+const sHit   = ()=>{ beep(150,0.25,"sawtooth",0.08); };
+const sZap   = ()=>{ beep(520,0.06,"square",0.05); setTimeout(()=>beep(260,0.1,"sawtooth",0.05),40); };
+const sOver  = ()=>{ beep(330,0.15,"square",0.06); setTimeout(()=>beep(220,0.2,"square",0.06),120); setTimeout(()=>beep(140,0.3,"square",0.06),260); };
 
 /* ---------- spawning ---------- */
-function spawnCreature(){
-  const bad = Math.random() < Math.min(0.35 + elapsed*0.004, 0.6);
-  const def = bad ? BAD[(Math.random()*BAD.length)|0] : GOOD[(Math.random()*GOOD.length)|0];
-  const spr = def.spr;
-  const h = spr.h*SCALE;
+function pushEntity(def, opts){
+  const spr = def.spr, h = spr.h*SCALE;
   const y = 8 + Math.random()*(H - h - 24);
-  entities.push({
-    spr, bad, score: def.score||0,
-    x: W + 8, y,
-    w: spr.w*SCALE, h,
+  entities.push(Object.assign({
+    spr, bad:false, power:false, score:def.score||0,
+    x: W + 8, y, w: spr.w*SCALE, h,
     vx: -(speed + Math.random()*30),
     baseY: y, phase: Math.random()*Math.PI*2,
-    amp: bad ? 6+Math.random()*10 : 4+Math.random()*6,
-    dead:false
-  });
+    amp: 4+Math.random()*8, dead:false
+  }, opts));
+}
+function spawnCreature(){
+  if (Math.random() < 0.07){ pushEntity(PEARL, {power:true, amp:8+Math.random()*8}); return; }
+  const bad = Math.random() < Math.min(0.35 + elapsed*0.004, 0.6);
+  if (bad) pushEntity(BAD[(Math.random()*BAD.length)|0], {bad:true, amp:6+Math.random()*10});
+  else     pushEntity(GOOD[(Math.random()*GOOD.length)|0], {});
 }
 function initDecor(){
   bubbles = [];
-  for(let i=0;i<28;i++) bubbles.push({
-    x:Math.random()*W, y:Math.random()*H,
-    r:1+Math.random()*2, v:8+Math.random()*22
-  });
+  for(let i=0;i<28;i++) bubbles.push({ x:Math.random()*W, y:Math.random()*H, r:1+Math.random()*2, v:8+Math.random()*22 });
   weeds = [];
-  for(let i=0;i<7;i++) weeds.push({ x: 10+i*46+Math.random()*20, s:1+(Math.random()*1.5|0), sway:Math.random()*Math.PI*2 });
+  for(let i=0;i<7;i++) weeds.push({ x:10+i*46+Math.random()*20, s:1+(Math.random()*1.5|0), sway:Math.random()*Math.PI*2 });
 }
 
 /* ---------- lifecycle ---------- */
 function startGame(){
-  state="play"; score=0; lives=3; speed=60; elapsed=0; spawnT=0; shake=0;
-  entities=[]; player.x=40; player.y=H/2; player.hurt=0;
+  state="play"; score=0; lives=3; combo=0; shield=0; speed=60; elapsed=0; spawnT=0; shake=0;
+  isNewBest=false; entities=[];
+  player.x=40; player.y=H/2; player.vx=0; player.vy=0; player.hurt=0; player.bobT=0;
   initDecor();
 }
 function gameOver(){
-  state="over"; sOver();
-  if(score>best){ best=score; localStorage.setItem("bitClaudeOceanBest", best); }
+  state="over"; sOver(); drag=null; pointerDownNow=false;
+  if(score>best){ best=score; isNewBest=true; saveBest(best); }
 }
 
-/* ---------- collision ---------- */
+/* ---------- collision (AABB, slightly padded for fairness) ---------- */
 function hit(a,b){
-  // shrink hitboxes a touch for fairness
   const pad=4;
   return a.x+pad < b.x+b.w-pad && a.x+a.w-pad > b.x+pad &&
          a.y+pad < b.y+b.h-pad && a.y+a.h-pad > b.y+pad;
 }
+function sparkle(x,y,n,v){
+  for(let i=0;i<n;i++) bubbles.push({x, y, r:1+Math.random()*2, v:(v||30)+Math.random()*30});
+  if(bubbles.length>70) bubbles.splice(0, bubbles.length-70);
+}
 
 /* ---------- update ---------- */
-let last = performance.now();
 function update(dt){
-  // ambient bubbles always rise
   for(const b of bubbles){ b.y -= b.v*dt; if(b.y < -4){ b.y = H+4; b.x = Math.random()*W; } }
-
-  if(state!=="play"){ return; }
+  if(state!=="play") return;
 
   elapsed += dt;
-  speed = 60 + elapsed*4;          // gradually faster
+  speed = 60 + elapsed*4;
   shake = Math.max(0, shake - dt*40);
+  shield = Math.max(0, shield - dt);
 
   // ---- player movement ----
-  const accel = 520, max = 150, fric = 0.86;
+  const accel=520, max=150, fric=0.86;
   let ax=0, ay=0;
   if(keys["arrowleft"]||keys["a"]) ax-=1;
   if(keys["arrowright"]||keys["d"]) ax+=1;
@@ -349,14 +406,11 @@ function update(dt){
     ax += Math.max(-1,Math.min(1,(drag.x-cx)/20));
     ay += Math.max(-1,Math.min(1,(drag.y-cy)/20));
   }
-  player.vx = (player.vx + ax*accel*dt)*fric;
-  player.vy = (player.vy + ay*accel*dt)*fric;
-  player.vx = Math.max(-max,Math.min(max,player.vx));
-  player.vy = Math.max(-max,Math.min(max,player.vy));
+  player.vx = Math.max(-max,Math.min(max,(player.vx + ax*accel*dt)*fric));
+  player.vy = Math.max(-max,Math.min(max,(player.vy + ay*accel*dt)*fric));
   if(Math.abs(player.vx)>5) player.flip = player.vx<0;
-  player.x += player.vx*dt; player.y += player.vy*dt;
-  player.x = Math.max(2, Math.min(W-player.w-2, player.x));
-  player.y = Math.max(2, Math.min(H-player.h-2, player.y));
+  player.x = Math.max(2, Math.min(W-player.w-2, player.x + player.vx*dt));
+  player.y = Math.max(2, Math.min(H-player.h-2, player.y + player.vy*dt));
   player.bobT += dt; player.hurt = Math.max(0, player.hurt-dt);
 
   // ---- spawn ----
@@ -367,17 +421,22 @@ function update(dt){
   for(const e of entities){
     e.x += e.vx*dt;
     e.y = e.baseY + Math.sin(player.bobT*2 + e.phase)*e.amp;
-    if(e.x + e.w < -8) e.dead = true;
-    if(!e.dead && player.hurt<=0 && hit(player,e)){
-      if(e.bad){
-        lives--; player.hurt=1.0; shake=6; sHit();
-        e.dead=true;
-        if(lives<=0){ gameOver(); }
-      }else{
-        score += e.score; sGood(); e.dead=true;
-        // sparkle bubbles on pickup
-        for(let i=0;i<6;i++) bubbles.push({x:e.x+e.w/2, y:e.y+e.h/2, r:1+Math.random()*2, v:30+Math.random()*30});
-        if(bubbles.length>60) bubbles.splice(0, bubbles.length-60);
+    if(e.x + e.w < -8){ e.dead = true; continue; }
+    if(hit(player,e)){
+      if(e.power){
+        shield = 6; score += Math.round(e.score*comboMult()); combo++;
+        sPearl(); sparkle(e.x+e.w/2, e.y+e.h/2, 8, 40); e.dead=true;
+      } else if(e.bad){
+        if(shield>0){                                 // shielded: zap the hazard
+          score += 5; shake=4; sZap(); e.dead=true;
+          sparkle(e.x+e.w/2, e.y+e.h/2, 6, 50);
+        } else if(player.hurt<=0){
+          lives--; combo=0; player.hurt=1.0; shake=6; sHit(); e.dead=true;
+          if(lives<=0){ gameOver(); }
+        }
+      } else {                                        // good collectible
+        combo++; score += Math.round(e.score*comboMult());
+        sGood(); sparkle(e.x+e.w/2, e.y+e.h/2, 6, 30); e.dead=true;
       }
     }
   }
@@ -386,11 +445,9 @@ function update(dt){
 
 /* ---------- render ---------- */
 function drawBG(t){
-  // water gradient
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,"#1b6ea0"); g.addColorStop(0.5,"#0e5077"); g.addColorStop(1,"#072a40");
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-  // light rays
   ctx.save(); ctx.globalAlpha=0.07; ctx.fillStyle="#bff4ff";
   for(let i=0;i<5;i++){
     const x = ((t*8 + i*70) % (W+60)) - 30;
@@ -399,15 +456,12 @@ function drawBG(t){
     ctx.closePath(); ctx.fill();
   }
   ctx.restore();
-  // ambient bubbles
   ctx.fillStyle="rgba(200,245,255,0.4)";
-  for(const b of bubbles){ ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,7); ctx.fill(); }
-  // sandy floor
+  for(const b of bubbles){ ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill(); }
   ctx.fillStyle="#15324a"; ctx.fillRect(0,H-10,W,10);
   ctx.fillStyle="#c9a06a"; ctx.fillRect(0,H-6,W,6);
   ctx.fillStyle="#b08a55";
   for(let x=0;x<W;x+=6) ctx.fillRect(x+((x*7)%3),H-6,2,2);
-  // seaweed
   for(const wd of weeds){
     const sway = Math.sin(t*1.5 + wd.sway)*1.4;
     drawSprite(seaweed, wd.x+sway, H-6-seaweed.h*wd.s, wd.s, false);
@@ -417,13 +471,14 @@ function drawBG(t){
 function drawHUD(){
   ctx.fillStyle="#dff6ff"; ctx.font="10px 'Courier New',monospace"; ctx.textAlign="left";
   ctx.fillText("SCORE "+score, 6, 12);
-  ctx.textAlign="right";
-  ctx.fillText("BEST "+best, W-6, 12);
-  // lives as little hearts
+  ctx.textAlign="right"; ctx.fillText("BEST "+best, W-6, 12);
   ctx.textAlign="left";
-  for(let i=0;i<3;i++){
-    ctx.fillStyle = i<lives ? "#ff5d7a" : "#3a5a6a";
-    ctx.fillText("♥", 6+i*12, 26);
+  for(let i=0;i<3;i++){ ctx.fillStyle = i<lives ? "#ff5d7a" : "#3a5a6a"; ctx.fillText("♥", 6+i*12, 26); }
+  const m = comboMult();
+  if(m>1){ ctx.fillStyle="#ffd23f"; ctx.fillText("COMBO x"+m, 44, 26); }
+  if(shield>0){
+    ctx.textAlign="right"; ctx.fillStyle="#7fe9ff";
+    ctx.fillText("SHIELD "+Math.ceil(shield)+"s", W-6, 26);
   }
 }
 
@@ -433,10 +488,23 @@ function centerText(lines, t){
   for(const ln of lines){
     ctx.font = ln.big ? "bold 18px 'Courier New',monospace" : "11px 'Courier New',monospace";
     ctx.fillStyle = ln.c || "#dff6ff";
-    const dy = ln.big ? Math.sin(t*3)*1.5 : 0;
-    ctx.fillText(ln.s, W/2, y+dy);
+    ctx.fillText(ln.s, W/2, y + (ln.big ? Math.sin(t*3)*1.5 : 0));
     y += ln.big ? 22 : 14;
   }
+}
+
+function drawPlayer(t){
+  const bob = Math.sin(player.bobT*4)*1.2;
+  if(shield>0){                                   // shield bubble (blink as it runs low)
+    if(shield>1.5 || Math.floor(shield*8)%2===0){
+      ctx.strokeStyle="rgba(127,233,255,0.7)"; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.arc(player.x+player.w/2, player.y+player.h/2+bob, player.w*0.75, 0, Math.PI*2);
+      ctx.stroke();
+    }
+  }
+  const blink = player.hurt>0 && (Math.floor(player.hurt*12)%2===0);
+  if(!blink) drawSprite(claude, Math.round(player.x), Math.round(player.y+bob), SCALE, player.flip);
 }
 
 function render(t){
@@ -444,36 +512,28 @@ function render(t){
   if(shake>0) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
   drawBG(t);
 
-  // creatures
   for(const e of entities){
     if(e.bad){ ctx.save(); ctx.globalAlpha = 0.85+0.15*Math.sin(t*8+e.phase); }
-    drawSprite(e.spr, Math.round(e.x), Math.round(e.y), SCALE, e.vx>0);
+    drawSprite(e.spr, Math.round(e.x), Math.round(e.y), SCALE, false);
     if(e.bad) ctx.restore();
   }
 
-  // player (blink when hurt, bob gently)
-  const bob = Math.sin(player.bobT*4)*1.2;
-  const blink = player.hurt>0 && (Math.floor(player.hurt*12)%2===0);
-  if(state==="play" || state==="over"){
-    if(!blink) drawSprite(claude, Math.round(player.x), Math.round(player.y+bob), SCALE, player.flip);
-  }
-
+  if(state==="play" || state==="over") drawPlayer(t);
   drawHUD();
 
   if(state==="title"){
-    // preview claude bobbing on title
-    drawSprite(claude, W/2-claude.w*SCALE/2, H/2-44+Math.sin(t*2)*3, SCALE, false);
+    drawSprite(claude, W/2-claude.w*SCALE/2, H/2-46+Math.sin(t*2)*3, SCALE, false);
     centerText([
       {s:"BIT CLAUDE'S OCEAN DIVE", big:true, c:"#6ff0ff"},
-      {s:"Collect 🐠 fish · ⭐ starfish · 🐚 shells", c:"#cfeeff"},
-      {s:"Dodge 🪼 jellyfish · 🐡 puffers · 🦀 crabs · 🦑 squid", c:"#ffd0d0"},
+      {s:"Collect fish, starfish, seahorses & shells", c:"#cfeeff"},
+      {s:"Grab pearls for a shield · dodge the rest", c:"#ffe6a0"},
       {s:"▶  Press SPACE / tap to dive in", c:"#8af1ec"},
     ], t);
   } else if(state==="over"){
     ctx.fillStyle="rgba(4,20,32,0.55)"; ctx.fillRect(0,0,W,H);
     centerText([
       {s:"GAME OVER", big:true, c:"#ff6f8a"},
-      {s:"You scored "+score+(score>=best?"  ★ NEW BEST!":"  (best "+best+")"), c:"#ffe8a0"},
+      {s:"Score "+score+(isNewBest?"  ★ NEW BEST!":"   (best "+best+")"), c:"#ffe8a0"},
       {s:"▶  Press SPACE / tap to dive again", c:"#8af1ec"},
     ], t);
   }
@@ -481,9 +541,10 @@ function render(t){
 }
 
 /* ---------- main loop ---------- */
+let last = performance.now();
 function frame(now){
   let dt = (now-last)/1000; last=now;
-  if(dt>0.05) dt=0.05; // clamp after tab switches
+  if(dt>0.05) dt=0.05;            // clamp after tab switches
   update(dt);
   render(now/1000);
   requestAnimationFrame(frame);
