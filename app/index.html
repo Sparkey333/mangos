@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WANDR — Your personal travel intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Aurora background -->
+  <div class="aurora" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <div class="grain"></div>
+  </div>
+
+  <!-- Top navigation -->
+  <header class="topbar" id="topbar" hidden>
+    <div class="brand">
+      <span class="logo-mark">◭</span>
+      <span class="logo-word">WANDR</span>
+    </div>
+    <div class="agent-chip" id="agentChip" title="Your personal sub-agent">
+      <span class="agent-orb"></span>
+      <span class="agent-meta">
+        <small>Your agent</small>
+        <strong id="agentName">—</strong>
+      </span>
+    </div>
+    <div class="nav-actions">
+      <button class="ghost-btn" id="shadowToggle" title="Open your Shadow Profile">
+        <span class="dot-pulse"></span> Shadow Profile
+      </button>
+      <button class="ghost-btn" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <!-- Shadow Profile drawer -->
+  <aside class="drawer" id="shadowDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <h3>Shadow Profile</h3>
+        <p class="muted" id="shadowSubtitle">What your agent has learned about you</p>
+      </div>
+      <button class="icon-btn" id="shadowClose">✕</button>
+    </div>
+    <div class="drawer-body" id="shadowBody"></div>
+  </aside>
+  <div class="drawer-scrim" id="drawerScrim" hidden></div>
+
+  <script src="data.js"></script>
+  <script src="agent.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
