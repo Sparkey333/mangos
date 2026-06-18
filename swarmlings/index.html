@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>SWARMLINGS — a swarm-command prototype</title>
+<style>
+  :root { --ui:#e9f5e1; --panel:rgba(8,18,12,0.82); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body { margin:0; height:100%; background:#0a120c; color:var(--ui);
+    font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:none; }
+  #wrap { position:fixed; inset:0; }
+  canvas { display:block; width:100%; height:100%; }
+  /* HUD */
+  #hud { position:fixed; top:0; left:0; right:0; padding:10px 12px;
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    pointer-events:none; text-shadow:0 1px 3px #000; font-size:14px; }
+  .badge { background:var(--panel); border:1px solid rgba(255,255,255,.12);
+    padding:6px 10px; border-radius:10px; pointer-events:auto; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:-1px; }
+  #daybar { position:fixed; left:12px; right:12px; bottom:10px; height:10px;
+    background:rgba(0,0,0,.5); border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,.12); }
+  #dayfill { height:100%; width:100%; background:linear-gradient(90deg,#ffd27a,#ff8a5b,#6f4bd8); transition:width .2s linear; }
+  /* buttons */
+  .btn { pointer-events:auto; cursor:pointer; background:var(--panel);
+    border:1px solid rgba(255,255,255,.15); color:var(--ui); padding:8px 12px;
+    border-radius:10px; font-size:14px; }
+  .btn:active { transform:translateY(1px); }
+  #topright { position:fixed; top:10px; right:12px; display:flex; gap:8px; z-index:5; }
+  /* settings panel */
+  #panel { position:fixed; top:0; right:0; bottom:0; width:min(340px,86vw);
+    background:var(--panel); backdrop-filter:blur(8px); border-left:1px solid rgba(255,255,255,.14);
+    transform:translateX(105%); transition:transform .25s ease; padding:16px; overflow:auto; z-index:10; }
+  #panel.open { transform:none; }
+  #panel h2 { margin:.2em 0 .6em; font-size:16px; letter-spacing:.04em; }
+  #panel h3 { margin:1em 0 .3em; font-size:12px; text-transform:uppercase; opacity:.7; letter-spacing:.08em; }
+  .row { margin:10px 0; }
+  .row label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+  input[type=range]{ width:100%; }
+  .seg { display:flex; gap:6px; }
+  .seg button { flex:1; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.05); color:var(--ui); cursor:pointer; font-size:13px; }
+  .seg button.active { background:#6f9c5a; border-color:#9fd17e; color:#08120c; font-weight:600; }
+  .hint { font-size:12px; opacity:.7; line-height:1.5; }
+  /* type selector */
+  #types { position:fixed; left:12px; bottom:30px; display:flex; gap:8px; z-index:5; }
+  .typebtn { pointer-events:auto; cursor:pointer; width:48px; height:48px; border-radius:12px;
+    border:2px solid rgba(255,255,255,.2); background:var(--panel); display:flex; align-items:center;
+    justify-content:center; font-size:12px; color:var(--ui); position:relative; }
+  .typebtn.active { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.25); }
+  .typebtn .c { width:18px; height:18px; border-radius:50%; }
+  .typebtn .n { position:absolute; bottom:2px; font-size:9px; opacity:.85; }
+  /* toast / banner */
+  #banner { position:fixed; top:46%; left:0; right:0; text-align:center; pointer-events:none; z-index:8; }
+  #banner span { display:inline-block; background:var(--panel); padding:14px 22px; border-radius:14px;
+    font-size:20px; border:1px solid rgba(255,255,255,.18); opacity:0; transition:opacity .3s; }
+  #banner.show span { opacity:1; }
+  #help { font-size:12px; line-height:1.6; opacity:.85; }
+  a { color:#9fd17e; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+</div>
+
+<div id="hud">
+  <div class="badge" id="b-theme">THEME</div>
+  <div class="badge"><span class="dot" id="d-field"></span>Field: <b id="n-field">0</b></div>
+  <div class="badge"><span class="dot" id="d-hive"></span>Hive: <b id="n-hive">0</b></div>
+  <div class="badge">Cargo home: <b id="n-cargo">0</b></div>
+  <div class="badge">Day <b id="n-day">1</b></div>
+</div>
+
+<div id="topright">
+  <button class="btn" id="btn-settings">⚙ Dials</button>
+</div>
+
+<div id="types"></div>
+
+<div id="daybar"><div id="dayfill"></div></div>
+<div id="banner"><span id="banner-text"></span></div>
+
+<div id="panel">
+  <h2>⚙ DIALS &amp; SKINS</h2>
+
+  <h3>World Skin (v2 / v3)</h3>
+  <div class="seg" id="seg-theme">
+    <button data-theme="bloom" class="active">v2 · Bloomlings</button>
+    <button data-theme="tide">v3 · Tidewardens</button>
+  </div>
+  <p class="hint" id="theme-lore"></p>
+
+  <h3>Scale lines</h3>
+  <div class="row">
+    <label>Swarm cap <span id="v-cap">100</span></label>
+    <input type="range" id="r-cap" min="20" max="300" step="10" value="100">
+  </div>
+  <div class="row">
+    <label>Creature scale <span id="v-scale">1.0×</span></label>
+    <input type="range" id="r-scale" min="0.6" max="2.2" step="0.1" value="1">
+  </div>
+  <div class="row">
+    <label>Leader speed <span id="v-speed">1.0×</span></label>
+    <input type="range" id="r-speed" min="0.6" max="2.0" step="0.1" value="1">
+  </div>
+  <div class="row">
+    <label>Day length <span id="v-day">90s</span></label>
+    <input type="range" id="r-day" min="30" max="240" step="10" value="90">
+  </div>
+
+  <h3>Music amp</h3>
+  <div class="row">
+    <label>Volume <span id="v-vol">35%</span></label>
+    <input type="range" id="r-vol" min="0" max="100" step="1" value="35">
+  </div>
+  <div class="row">
+    <label>Intensity <span id="v-int">1.0×</span></label>
+    <input type="range" id="r-int" min="0.5" max="2.0" step="0.1" value="1">
+  </div>
+  <p class="hint">Tempo &amp; layers rise automatically with swarm size; the amp scales the mix.</p>
+
+  <h3>Fidelity</h3>
+  <div class="seg" id="seg-hd">
+    <button data-hd="low">Lite</button>
+    <button data-hd="std" class="active">Standard</button>
+    <button data-hd="hi">Hi-Def</button>
+  </div>
+  <p class="hint">Hi-Def adds shadows, glow, grass, and more particles. Drop to Lite on older phones.</p>
+
+  <h3>How to play</h3>
+  <div id="help">
+    • <b>Move:</b> WASD / arrows, or drag on screen.<br>
+    • <b>Throw a creature:</b> click / tap toward a target. It grabs cargo, fights foes, or breaks walls.<br>
+    • <b>Whistle (recall):</b> Space, or the ⟳ button — pulls nearby creatures back to you.<br>
+    • <b>Grow:</b> carry glowing <b>cargo</b> to your <b>Hive</b> to hatch more creatures.<br>
+    • <b>Pick type:</b> bottom-left buttons. Each color resists a different hazard.<br>
+    • <b>Beat the day:</b> bank cargo before the bar runs out. Strays left in the field are lost at dusk.
+  </div>
+  <p class="hint" style="margin-top:14px">Prototype. See DESIGN.md &amp; IP-FINDINGS.md in this folder for the roadmap and legal notes.</p>
+  <button class="btn" id="btn-restart" style="margin-top:10px;width:100%">↺ Restart day</button>
+</div>
+
+<button class="btn" id="btn-whistle" style="position:fixed; right:12px; bottom:30px; z-index:5;">⟳ Whistle</button>
+
+<script>
+"use strict";
+/* =========================================================================
+   SWARMLINGS — single-file swarm-command prototype
+   One engine, two skins (v2 Bloomlings / v3 Tidewardens), live dials.
+   Mechanic (swarm command + day timer) is genre, not IP. All names, art,
+   palette, and lore here are original. See IP-FINDINGS.md.
+   ========================================================================= */
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+let W = 0, H = 0;
+
+/* ---------- THEMES (the v2 / v3 skins) ---------------------------------- */
+const THEMES = {
+  bloom: {
+    name: "BLOOMLINGS",
+    lore: "A stranded surveyor wakes on a fungal world and rallies the local sprites to salvage ship parts before the spores bloom at dusk.",
+    sky: ["#16241a", "#0c150f"],
+    ground: "#1c2f20",
+    grass: "#274a2c",
+    leader: "#ffe08a", leaderName: "Surveyor",
+    hive: "#caa6ff", hiveName: "Hive-Pod",
+    cargo: "#9fe7ff", cargoName: "Salvage",
+    foe: "#d2566b", foeName: "Gnashbud",
+    wall: "#7a5a3c", wallName: "Bramble-gate",
+    types: [
+      { id:"ember", c:"#ff6b57", n:"Ember", resist:"fire",  pow:1.5, name:"Ember" },
+      { id:"tide",  c:"#5bc8ff", n:"Tide",  resist:"water", pow:1.0, name:"Tide" },
+      { id:"stone", c:"#ffd54a", n:"Stone", resist:"shock", pow:1.0, throw:1.4, name:"Stone" },
+    ],
+    particles:"spore",
+  },
+  tide: {
+    name: "TIDEWARDENS",
+    lore: "Deep in a sunlit reef, a coral-keeper commands drifting polyps to haul pearls back to the spire before the tide turns black.",
+    sky: ["#08243a", "#041523"],
+    ground: "#0a2f44",
+    grass: "#0f5a5c",
+    leader: "#bff7ff", leaderName: "Coral-keeper",
+    hive: "#ff9ad1", hiveName: "Spire",
+    cargo: "#ffe27a", cargoName: "Pearl",
+    foe: "#7b5bff", foeName: "Gulper",
+    wall: "#3a6a7a", wallName: "Kelp-wall",
+    types: [
+      { id:"ember", c:"#ff7ab0", n:"Coral", resist:"fire",  pow:1.5, name:"Coral" },
+      { id:"tide",  c:"#6fe7d0", n:"Drift", resist:"water", pow:1.0, name:"Drift" },
+      { id:"stone", c:"#ffe27a", n:"Shell", resist:"shock", pow:1.0, throw:1.4, name:"Shell" },
+    ],
+    particles:"bubble",
+  }
+};
+
+/* ---------- SETTINGS (driven by the dials) ------------------------------ */
+const S = {
+  theme: "bloom",
+  cap: 100,
+  scale: 1.0,
+  speed: 1.0,
+  dayLen: 90,
+  vol: 0.35,
+  intensity: 1.0,
+  hd: "std",
+};
+function T(){ return THEMES[S.theme]; }
+
+/* ---------- WORLD STATE ------------------------------------------------- */
+const world = {
+  w: 2400, h: 1600,
+};
+let cam = { x:0, y:0 };
+let leader, swarm, foes, cargos, walls, particles;
+let activeType = 0;
+let dayT = 0, day = 1, cargoBanked = 0, dusk = false;
+let lastTs = 0;
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+function dist2(ax,ay,bx,by){ const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; }
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+
+/* ---------- ENTITY FACTORIES ------------------------------------------- */
+function makeLeader(){
+  return { x: world.w/2, y: world.h/2, vx:0, vy:0, r:14 };
+}
+function makeCreature(x,y,typeIdx){
+  return {
+    x, y, vx:0, vy:0, r:6, type:typeIdx,
+    state:"follow",        // follow | thrown | task | carry | fight
+    target:null, carry:null, hp:1,
+    tx:0, ty:0, t:0, wob: Math.random()*6.28,
+  };
+}
+function makeCargo(x,y,weight){
+  return { x, y, r:10+weight*3, weight, carriers:[], home:false, hazard:null };
+}
+function makeFoe(x,y){
+  return { x, y, vx:0, vy:0, r:18, hp:14, eat:0, wob:Math.random()*6.28, ax:x, ay:y };
+}
+function makeWall(x,y,hazard){
+  return { x, y, r:26, hp:10, hazard };
+}
+
+/* ---------- LEVEL SETUP ------------------------------------------------- */
+function setup(reseedDay){
+  if(!reseedDay){ /* nothing persistent yet */ }
+  leader = makeLeader();
+  swarm = [];
+  foes = [];
+  cargos = [];
+  walls = [];
+  particles = [];
+  activeType = 0;
+  dayT = 0; dusk = false;
+
+  // Hive position
+  world.hive = { x: world.w/2, y: world.h/2 + 60, r: 34 };
+
+  // starter swarm
+  const start = day === 1 ? 12 : Math.min(S.cap, Math.max(8, lastSurvivors));
+  for(let i=0;i<start;i++){
+    const a = rand(0,6.28), d = rand(20,70);
+    swarm.push(makeCreature(world.hive.x+Math.cos(a)*d, world.hive.y+Math.sin(a)*d, i%3));
+  }
+
+  // cargo scattered
+  const cargoCount = 14 + day*2;
+  for(let i=0;i<cargoCount;i++){
+    cargos.push(makeCargo(rand(120,world.w-120), rand(120,world.h-120), Math.floor(rand(1,5))));
+  }
+  // foes
+  for(let i=0;i<3+day;i++){
+    foes.push(makeFoe(rand(200,world.w-200), rand(200,world.h-200)));
+  }
+  // hazard walls (each tied to a resist type)
+  const hazards = ["fire","water","shock"];
+  for(let i=0;i<5+day;i++){
+    walls.push(makeWall(rand(150,world.w-150), rand(150,world.h-150), hazards[i%3]));
+  }
+  banner(`Day ${day} · ${T().name}`, 1400);
+}
+let lastSurvivors = 12;
+
+/* ---------- INPUT ------------------------------------------------------- */
+const keys = {};
+addEventListener('keydown', e=>{
+  keys[e.key.toLowerCase()] = true;
+  if(e.code === "Space"){ whistle(); e.preventDefault(); }
+});
+addEventListener('keyup', e=> keys[e.key.toLowerCase()] = false);
+
+let pointerDrag = null;      // for moving leader by drag
+function screenToWorld(px,py){ return { x: px + cam.x, y: py + cam.y }; }
+
+canvas.addEventListener('pointerdown', e=>{
+  audioStart();
+  const wp = screenToWorld(e.clientX, e.clientY);
+  // tap near leader (within 90px) = drag-move; else = throw toward point
+  if(dist2(wp.x,wp.y,leader.x,leader.y) < 90*90){
+    pointerDrag = { id:e.pointerId };
+  } else {
+    throwCreature(wp.x, wp.y);
+    pointerDrag = { id:e.pointerId, moved:false, sx:e.clientX, sy:e.clientY };
+  }
+});
+canvas.addEventListener('pointermove', e=>{
+  if(pointerDrag && pointerDrag.id === e.pointerId){
+    const wp = screenToWorld(e.clientX, e.clientY);
+    leader.tx = wp.x; leader.ty = wp.y; leader.dragging = true;
+  }
+});
+canvas.addEventListener('pointerup', e=>{ if(pointerDrag && pointerDrag.id===e.pointerId){ pointerDrag=null; leader.dragging=false; } });
+canvas.addEventListener('contextmenu', e=>{ e.preventDefault(); whistle(); });
+
+function whistle(){
+  for(const c of swarm){
+    if(dist2(c.x,c.y,leader.x,leader.y) < 220*220 && c.state!=="carry"){
+      c.state = "follow"; c.target=null;
+    }
+  }
+  pulse = 1;
+  beep(660, 0.07, 0.2);
+}
+let pulse = 0;
+
+let throwIdx = 0;
+function throwCreature(wx,wy){
+  // pick a following creature of the active type (fallback any)
+  let pick = null;
+  for(const c of swarm){ if(c.state==="follow" && c.type===activeType){ pick=c; break; } }
+  if(!pick) for(const c of swarm){ if(c.state==="follow"){ pick=c; break; } }
+  if(!pick) return;
+  pick.state = "thrown";
+  pick.tx = wx; pick.ty = wy;
+  pick.t = 0;
+  const tdef = T().types[pick.type];
+  pick.throwArc = (tdef.throw||1);
+  beep(380 + pick.type*120, 0.05, 0.12);
+}
+
+/* ---------- UPDATE ------------------------------------------------------ */
+function update(dt){
+  // ---- day timer
+  if(!dusk){
+    dayT += dt;
+    if(dayT >= S.dayLen){ endDay(); }
+  }
+
+  // ---- leader movement
+  const sp = 240 * S.speed;
+  let mx=0,my=0;
+  if(keys['w']||keys['arrowup']) my-=1;
+  if(keys['s']||keys['arrowdown']) my+=1;
+  if(keys['a']||keys['arrowleft']) mx-=1;
+  if(keys['d']||keys['arrowright']) mx+=1;
+  if(leader.dragging){
+    const dx=leader.tx-leader.x, dy=leader.ty-leader.y, d=Math.hypot(dx,dy)||1;
+    if(d>6){ mx=dx/d; my=dy/d; }
+  }
+  const ml = Math.hypot(mx,my)||1;
+  leader.x = clamp(leader.x + (mx/ml)*sp*dt, 20, world.w-20);
+  leader.y = clamp(leader.y + (my/ml)*sp*dt, 20, world.h-20);
+
+  // ---- camera follow
+  cam.x = clamp(leader.x - W/2, 0, world.w - W);
+  cam.y = clamp(leader.y - H/2, 0, world.h - H);
+  if(world.w < W) cam.x = (world.w-W)/2;
+  if(world.h < H) cam.y = (world.h-H)/2;
+
+  // ---- creatures
+  const cr = 6 * S.scale;
+  for(const c of swarm){
+    c.r = cr;
+    if(c.state==="follow"){
+      // flock loosely behind leader
+      c.wob += dt*4;
+      const tx = leader.x + Math.cos(c.wob)*rand(18,40);
+      const ty = leader.y + Math.sin(c.wob*1.1)*rand(18,40);
+      steer(c, tx, ty, 180, dt);
+      // auto-grab nearby task if very close to leader's facing? keep manual for clarity
+    }
+    else if(c.state==="thrown"){
+      c.t += dt;
+      // simple lerp to target with a little arc
+      const k = Math.min(1, c.t*2.2);
+      c.x += (c.tx - c.x)*Math.min(1,dt*8);
+      c.y += (c.ty - c.y)*Math.min(1,dt*8);
+      if(dist2(c.x,c.y,c.tx,c.ty) < 14*14){
+        assignTask(c);
+      }
+    }
+    else if(c.state==="task" || c.state==="fight"){
+      handleTask(c, dt);
+    }
+    else if(c.state==="carry"){
+      handleCarry(c, dt);
+    }
+  }
+
+  // ---- cargo carrying resolution
+  for(const cg of cargos){
+    if(cg.home) continue;
+    const need = cg.weight; // carriers required
+    cg.carriers = cg.carriers.filter(c=> swarm.includes(c) && c.state==="carry" && c.carry===cg);
+    if(cg.carriers.length >= need){
+      // move toward hive
+      const dx=world.hive.x-cg.x, dy=world.hive.y-cg.y, d=Math.hypot(dx,dy)||1;
+      const v = 60 * Math.min(2, cg.carriers.length/need);
+      cg.x += dx/d*v*dt; cg.y += dy/d*v*dt;
+      for(const c of cg.carriers){ c.x = cg.x + rand(-cg.r,cg.r); c.y = cg.y + rand(-cg.r,cg.r); }
+      if(d < world.hive.r + cg.r){
+        depositCargo(cg);
+      }
+    }
+  }
+
+  // ---- foes
+  for(const f of foes){
+    if(f.hp<=0) continue;
+    f.wob += dt;
+    // wander, but chase nearby creatures
+    let prey=null, pd=160*160;
+    for(const c of swarm){ const dd=dist2(c.x,c.y,f.x,f.y); if(dd<pd){pd=dd;prey=c;} }
+    if(prey){
+      const dx=prey.x-f.x, dy=prey.y-f.y, d=Math.hypot(dx,dy)||1;
+      f.x += dx/d*70*dt; f.y += dy/d*70*dt;
+      if(d < f.r){ // eat
+        f.eat += dt;
+        if(f.eat>0.5){ killCreature(prey); f.eat=0; }
+      }
+    } else {
+      f.x += Math.cos(f.wob*0.7)*30*dt;
+      f.y += Math.sin(f.wob*0.9)*30*dt;
+      f.x = clamp(f.x, 60, world.w-60); f.y = clamp(f.y, 60, world.h-60);
+    }
+  }
+  foes = foes.filter(f=> f.hp>0);
+
+  // ---- particles
+  updateParticles(dt);
+  if(pulse>0) pulse = Math.max(0, pulse - dt*2);
+
+  // ---- music reacts to swarm
+  audioTick(dt);
+
+  updateHUD();
+}
+
+function steer(c, tx, ty, sp, dt){
+  const dx=tx-c.x, dy=ty-c.y, d=Math.hypot(dx,dy)||1;
+  c.x += dx/d*sp*dt; c.y += dy/d*sp*dt;
+}
+
+/* assign a task based on what the thrown creature landed on */
+function assignTask(c){
+  const tdef = T().types[c.type];
+  // foe?
+  for(const f of foes){ if(f.hp>0 && dist2(c.x,c.y,f.x,f.y) < (f.r+30)*(f.r+30)){ c.state="fight"; c.target=f; return; } }
+  // wall?
+  for(const w of walls){ if(w.hp>0 && dist2(c.x,c.y,w.x,w.y) < (w.r+30)*(w.r+30)){ c.state="task"; c.target=w; return; } }
+  // cargo?
+  let best=null,bd=60*60;
+  for(const cg of cargos){ if(!cg.home){ const dd=dist2(c.x,c.y,cg.x,cg.y); if(dd<bd){bd=dd;best=cg;} } }
+  if(best){ c.state="carry"; c.carry=best; if(!best.carriers.includes(c)) best.carriers.push(c); return; }
+  c.state="follow";
+}
+
+function handleTask(c, dt){
+  const w = c.target;
+  if(!w || w.hp<=0){ c.state="follow"; c.target=null; return; }
+  steer(c, w.x, w.y, 120, dt);
+  if(dist2(c.x,c.y,w.x,w.y) < (w.r+8)*(w.r+8)){
+    const tdef = T().types[c.type];
+    const eff = (tdef.resist === w.hazard) ? 2.2 : 0.6; // right type breaks fast
+    w.hp -= eff*dt*4;
+    if(Math.random()<0.3) spawnParticle(c.x,c.y, tdef.c);
+    if(w.hp<=0){ for(let i=0;i<8;i++) spawnParticle(w.x,w.y, T().wall); }
+  }
+}
+
+function handleCarry(c, dt){
+  const cg = c.carry;
+  if(!cg || cg.home){ c.state="follow"; c.carry=null; return; }
+  if(cg.carriers.length < cg.weight){
+    // not enough helpers yet: gather on the cargo and wait
+    steer(c, cg.x, cg.y, 100, dt);
+  }
+  // movement handled in cargo loop
+}
+
+function handleFight(){} // (fight resolved below)
+
+/* fight resolution folded into update via state */
+function resolveFights(dt){
+  for(const c of swarm){
+    if(c.state!=="fight") continue;
+    const f = c.target;
+    if(!f || f.hp<=0){ c.state="follow"; c.target=null; continue; }
+    steer(c, f.x, f.y, 130, dt);
+    if(dist2(c.x,c.y,f.x,f.y) < (f.r+8)*(f.r+8)){
+      const tdef = T().types[c.type];
+      f.hp -= tdef.pow*dt*6;
+      if(Math.random()<0.25) spawnParticle(c.x,c.y, T().foe);
+      if(f.hp<=0){ for(let i=0;i<14;i++) spawnParticle(f.x,f.y, T().foe); beep(200,0.12,0.2); }
+    }
+  }
+}
+
+function depositCargo(cg){
+  cg.home = true;
+  cargoBanked += cg.weight;
+  // hatch new creatures (population growth), capped by dial
+  const hatch = Math.min(cg.weight+1, S.cap - swarm.length);
+  for(let i=0;i<hatch;i++){
+    const a=rand(0,6.28), d=rand(20,50);
+    swarm.push(makeCreature(world.hive.x+Math.cos(a)*d, world.hive.y+Math.sin(a)*d, Math.floor(rand(0,3))));
+  }
+  for(const c of cg.carriers){ c.state="follow"; c.carry=null; }
+  for(let i=0;i<16;i++) spawnParticle(world.hive.x, world.hive.y, T().cargo);
+  beep(880,0.1,0.25);
+}
+
+function killCreature(c){
+  const i = swarm.indexOf(c); if(i>=0) swarm.splice(i,1);
+  for(let k=0;k<6;k++) spawnParticle(c.x,c.y, "#ffffff");
+}
+
+/* ---------- DAY CYCLE -------------------------------------------------- */
+function endDay(){
+  dusk = true;
+  // strays in the field (not near leader/hive) are lost
+  let survivors = 0;
+  swarm = swarm.filter(c=>{
+    const safe = dist2(c.x,c.y,leader.x,leader.y) < 240*240 ||
+                 dist2(c.x,c.y,world.hive.x,world.hive.y) < 220*220 ||
+                 c.state==="carry";
+    if(safe) survivors++;
+    else for(let k=0;k<4;k++) spawnParticle(c.x,c.y,"#000");
+    return safe;
+  });
+  lastSurvivors = Math.max(6, survivors);
+  banner(`Dusk · banked ${cargoBanked} ${T().cargoName} · ${survivors} survived`, 2600);
+  setTimeout(()=>{ day++; setup(true); }, 2600);
+}
+
+/* ---------- PARTICLES -------------------------------------------------- */
+function spawnParticle(x,y,color){
+  if(S.hd==="low" && Math.random()<0.6) return;
+  particles.push({ x,y, vx:rand(-40,40), vy:rand(-60,-10), life:rand(0.4,1), max:1, color });
+}
+function updateParticles(dt){
+  for(const p of particles){ p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=60*dt; p.life-=dt; }
+  particles = particles.filter(p=>p.life>0);
+  // ambient drift particles in HD
+  if(S.hd==="hi" && particles.length<120 && Math.random()<0.5){
+    particles.push({ x:cam.x+rand(0,W), y:cam.y+rand(0,H), vx:rand(-10,10), vy:rand(-15,-3),
+      life:rand(1,2.5), max:2.5, color: T().particles==="bubble" ? "#bff" : "#cfe" , ambient:true });
+  }
+}
+
+/* ---------- RENDER ----------------------------------------------------- */
+function render(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  // sky gradient
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, T().sky[0]); g.addColorStop(1, T().sky[1]);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  ctx.save();
+  ctx.translate(-cam.x, -cam.y);
+
+  // ground
+  ctx.fillStyle = T().ground;
+  ctx.fillRect(0,0,world.w,world.h);
+  // grass texture (HD)
+  if(S.hd!=="low"){
+    ctx.strokeStyle = T().grass; ctx.globalAlpha = S.hd==="hi"?0.5:0.25; ctx.lineWidth=1;
+    const step = S.hd==="hi"?34:60;
+    const x0=Math.floor(cam.x/step)*step, y0=Math.floor(cam.y/step)*step;
+    ctx.beginPath();
+    for(let x=x0;x<cam.x+W;x+=step){ for(let y=y0;y<cam.y+H;y+=step){
+      ctx.moveTo(x,y); ctx.lineTo(x+ (S.hd==="hi"?6:4), y-8);
+    }}
+    ctx.stroke(); ctx.globalAlpha=1;
+  }
+  // world border
+  ctx.strokeStyle="rgba(255,255,255,.12)"; ctx.lineWidth=3; ctx.strokeRect(0,0,world.w,world.h);
+
+  // hive
+  drawHive();
+
+  // walls
+  for(const w of walls){ if(w.hp>0) drawWall(w); }
+  // cargo
+  for(const cg of cargos){ if(!cg.home) drawCargo(cg); }
+  // foes
+  for(const f of foes) drawFoe(f);
+  // creatures
+  for(const c of swarm) drawCreature(c);
+  // leader
+  drawLeader();
+  // particles
+  for(const p of particles){
+    ctx.globalAlpha = clamp(p.life/p.max,0,1) * (p.ambient?0.4:1);
+    ctx.fillStyle=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y, p.ambient?2:3, 0, 6.28); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  // whistle pulse
+  if(pulse>0){
+    ctx.strokeStyle=`rgba(255,255,255,${pulse*0.6})`; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(leader.x,leader.y, (1-pulse)*220, 0, 6.28); ctx.stroke();
+  }
+
+  ctx.restore();
+
+  // dusk vignette
+  if(dusk){ ctx.fillStyle="rgba(20,8,30,.45)"; ctx.fillRect(0,0,W,H); }
+}
+
+function shadow(x,y,r){
+  if(S.hd==="low") return;
+  ctx.fillStyle="rgba(0,0,0,.28)";
+  ctx.beginPath(); ctx.ellipse(x, y+r*0.7, r*0.9, r*0.4, 0,0,6.28); ctx.fill();
+}
+function drawLeader(){
+  shadow(leader.x,leader.y,leader.r);
+  if(S.hd==="hi"){ ctx.shadowColor=T().leader; ctx.shadowBlur=16; }
+  ctx.fillStyle=T().leader;
+  ctx.beginPath(); ctx.arc(leader.x,leader.y,leader.r,0,6.28); ctx.fill();
+  ctx.shadowBlur=0;
+  // visor
+  ctx.fillStyle="#0a120c"; ctx.beginPath(); ctx.arc(leader.x,leader.y-2,leader.r*0.45,0,6.28); ctx.fill();
+}
+function drawCreature(c){
+  const tdef = T().types[c.type];
+  shadow(c.x,c.y,c.r);
+  if(S.hd==="hi"){ ctx.shadowColor=tdef.c; ctx.shadowBlur=8; }
+  ctx.fillStyle=tdef.c;
+  ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,6.28); ctx.fill();
+  ctx.shadowBlur=0;
+  // stem
+  ctx.strokeStyle=tdef.c; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(c.x,c.y-c.r); ctx.lineTo(c.x,c.y-c.r-4*S.scale); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(c.x,c.y-c.r-4*S.scale,1.6*S.scale,0,6.28); ctx.fill();
+}
+function drawCargo(cg){
+  shadow(cg.x,cg.y,cg.r);
+  if(S.hd==="hi"){ ctx.shadowColor=T().cargo; ctx.shadowBlur=14; }
+  ctx.fillStyle=T().cargo; ctx.globalAlpha=0.9;
+  ctx.beginPath(); ctx.arc(cg.x,cg.y,cg.r,0,6.28); ctx.fill();
+  ctx.globalAlpha=1; ctx.shadowBlur=0;
+  // weight pips
+  ctx.fillStyle="#08120c"; ctx.font="bold 11px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(cg.carriers.length+"/"+cg.weight, cg.x, cg.y);
+}
+function drawFoe(f){
+  shadow(f.x,f.y,f.r);
+  ctx.fillStyle=T().foe;
+  ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.28); ctx.fill();
+  // hp ring
+  ctx.strokeStyle="rgba(255,255,255,.3)"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(f.x,f.y,f.r+4, -1.57, -1.57 + 6.28*(f.hp/14)); ctx.stroke();
+  // eyes
+  ctx.fillStyle="#08120c";
+  ctx.beginPath(); ctx.arc(f.x-5,f.y-3,3,0,6.28); ctx.arc(f.x+5,f.y-3,3,0,6.28); ctx.fill();
+}
+function drawWall(w){
+  ctx.fillStyle=T().wall;
+  ctx.beginPath(); ctx.arc(w.x,w.y,w.r,0,6.28); ctx.fill();
+  // hazard tint ring shows which type breaks it
+  const map={fire:"#ff6b57",water:"#5bc8ff",shock:"#ffd54a"};
+  ctx.strokeStyle=map[w.hazard]; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.arc(w.x,w.y,w.r+3,0,6.28*(w.hp/10)); ctx.stroke();
+}
+function drawHive(){
+  const h=world.hive;
+  if(S.hd!=="low"){ ctx.shadowColor=T().hive; ctx.shadowBlur=24; }
+  ctx.fillStyle=T().hive;
+  ctx.beginPath(); ctx.arc(h.x,h.y,h.r,0,6.28); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.arc(h.x,h.y,h.r*0.55,0,6.28); ctx.fill();
+  ctx.fillStyle=T().hive; ctx.font="bold 11px system-ui"; ctx.textAlign="center";
+  ctx.fillText(T().hiveName, h.x, h.y - h.r - 6);
+}
+
+/* ---------- AUDIO (procedural "music amp") ----------------------------- */
+let actx=null, master=null, musicGain=null, started=false;
+let bassOsc=null, padOsc=null, padOsc2=null, arpTimer=0, arpStep=0;
+function audioStart(){
+  if(started) return; started=true;
+  try{
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    master = actx.createGain(); master.gain.value = S.vol; master.connect(actx.destination);
+    musicGain = actx.createGain(); musicGain.gain.value = 0.0; musicGain.connect(master);
+    // pad
+    padOsc = actx.createOscillator(); padOsc.type="sine"; padOsc.frequency.value=110;
+    padOsc2 = actx.createOscillator(); padOsc2.type="triangle"; padOsc2.frequency.value=164.81;
+    const padG = actx.createGain(); padG.gain.value=0.25;
+    padOsc.connect(padG); padOsc2.connect(padG); padG.connect(musicGain);
+    padOsc.start(); padOsc2.start();
+  }catch(e){ console.warn("audio off", e); }
+}
+function beep(freq, dur, gain){
+  if(!actx) return;
+  const o=actx.createOscillator(), g=actx.createGain();
+  o.frequency.value=freq; o.type="square";
+  g.gain.value=0; g.connect(master); o.connect(g);
+  const t=actx.currentTime;
+  g.gain.linearRampToValueAtTime(gain*S.intensity, t+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.start(t); o.stop(t+dur+0.02);
+}
+const SCALE_NOTES = [220,246.94,293.66,329.63,392,440,587.33];
+function audioTick(dt){
+  if(!actx) return;
+  master.gain.value += (S.vol - master.gain.value)*0.1;
+  // intensity rises with swarm size
+  const energy = clamp(swarm.length / Math.max(20,S.cap), 0, 1);
+  musicGain.gain.value += ((0.15 + energy*0.85) - musicGain.gain.value)*0.05;
+  // arpeggio whose tempo scales with energy * intensity dial
+  const bpm = (70 + energy*120) * S.intensity;
+  arpTimer += dt;
+  if(arpTimer > 60/bpm/2){
+    arpTimer = 0;
+    const n = SCALE_NOTES[arpStep % SCALE_NOTES.length];
+    const o=actx.createOscillator(), gg=actx.createGain();
+    o.type = S.theme==="tide" ? "triangle":"square";
+    o.frequency.value = n * (1 + (arpStep%3===0?1:0));
+    gg.gain.value=0; gg.connect(musicGain); o.connect(gg);
+    const t=actx.currentTime;
+    gg.gain.linearRampToValueAtTime(0.12*(0.4+energy), t+0.02);
+    gg.gain.exponentialRampToValueAtTime(0.0001, t+0.25);
+    o.start(t); o.stop(t+0.3);
+    arpStep++;
+  }
+}
+
+/* ---------- HUD -------------------------------------------------------- */
+function updateHUD(){
+  document.getElementById('n-field').textContent = swarm.filter(c=>c.state!=="follow").length;
+  document.getElementById('n-hive').textContent = swarm.filter(c=>c.state==="follow").length;
+  document.getElementById('n-cargo').textContent = cargoBanked;
+  document.getElementById('n-day').textContent = day;
+  document.getElementById('dayfill').style.width = (100*(1-dayT/S.dayLen)).toFixed(1)+"%";
+  document.getElementById('b-theme').textContent = T().name;
+  document.getElementById('d-field').style.background = T().types[activeType].c;
+  document.getElementById('d-hive').style.background = T().hive;
+}
+let bannerTimer=0;
+function banner(text, ms){
+  const b=document.getElementById('banner'), tx=document.getElementById('banner-text');
+  tx.textContent=text; b.classList.add('show'); clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>b.classList.remove('show'), ms);
+}
+
+/* ---------- TYPE SELECTOR UI ------------------------------------------ */
+function buildTypeUI(){
+  const host=document.getElementById('types'); host.innerHTML="";
+  T().types.forEach((t,i)=>{
+    const b=document.createElement('div');
+    b.className="typebtn"+(i===activeType?" active":"");
+    b.innerHTML=`<div class="c" style="background:${t.c}"></div><div class="n">${t.n}</div>`;
+    b.onclick=()=>{ activeType=i; buildTypeUI(); };
+    host.appendChild(b);
+  });
+}
+
+/* ---------- SETTINGS WIRING ------------------------------------------- */
+function bindDials(){
+  const link=(id,label,fn,fmt)=>{
+    const el=document.getElementById(id), out=document.getElementById(label);
+    const apply=()=>{ fn(parseFloat(el.value)); if(out) out.textContent=fmt(el.value); };
+    el.addEventListener('input', apply); apply();
+  };
+  link('r-cap','v-cap', v=>S.cap=v, v=>v);
+  link('r-scale','v-scale', v=>S.scale=v, v=>(+v).toFixed(1)+"×");
+  link('r-speed','v-speed', v=>S.speed=v, v=>(+v).toFixed(1)+"×");
+  link('r-day','v-day', v=>S.dayLen=v, v=>v+"s");
+  link('r-vol','v-vol', v=>{S.vol=v/100; if(master) master.gain.value=S.vol;}, v=>v+"%");
+  link('r-int','v-int', v=>S.intensity=v, v=>(+v).toFixed(1)+"×");
+
+  // theme seg
+  document.querySelectorAll('#seg-theme button').forEach(btn=>{
+    btn.onclick=()=>{
+      document.querySelectorAll('#seg-theme button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      S.theme=btn.dataset.theme;
+      document.getElementById('theme-lore').textContent=T().lore;
+      buildTypeUI();
+    };
+  });
+  document.getElementById('theme-lore').textContent=T().lore;
+
+  // hd seg
+  document.querySelectorAll('#seg-hd button').forEach(btn=>{
+    btn.onclick=()=>{
+      document.querySelectorAll('#seg-hd button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); S.hd=btn.dataset.hd; resize();
+    };
+  });
+
+  document.getElementById('btn-settings').onclick=()=>document.getElementById('panel').classList.toggle('open');
+  document.getElementById('btn-whistle').onclick=whistle;
+  document.getElementById('btn-restart').onclick=()=>{ day=1; lastSurvivors=12; cargoBanked=0; setup(false); };
+}
+
+/* ---------- RESIZE / LOOP --------------------------------------------- */
+function resize(){
+  DPR = S.hd==="hi" ? Math.min(window.devicePixelRatio||1,2)
+       : S.hd==="low" ? 1 : Math.min(window.devicePixelRatio||1,1.5);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W*DPR; canvas.height=H*DPR;
+  canvas.style.width=W+"px"; canvas.style.height=H+"px";
+}
+addEventListener('resize', resize);
+
+function loop(ts){
+  const dt = Math.min(0.033, (ts - lastTs)/1000 || 0); lastTs=ts;
+  if(!dusk || true){ update(dt); resolveFights(dt); }
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ---------- BOOT ------------------------------------------------------- */
+resize();
+bindDials();
+setup(false);
+buildTypeUI();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
