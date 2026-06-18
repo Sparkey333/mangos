@@ -1,0 +1,69 @@
+{
+  "agents": [
+    {
+      "id": "explore",
+      "displayName": "Explore",
+      "tier": "specialist",
+      "role": "researcher",
+      "project": "mangos",
+      "origin": "used",
+      "encounters": 40,
+      "notes": "broad fan-out reader, read-only"
+    },
+    {
+      "id": "plan",
+      "displayName": "Plan",
+      "tier": "specialist",
+      "role": "architect",
+      "project": "mangos",
+      "origin": "used",
+      "encounters": 18
+    },
+    {
+      "id": "general",
+      "displayName": "General-Purpose",
+      "tier": "task",
+      "role": "general",
+      "project": "mangos",
+      "origin": "used",
+      "encounters": 60
+    },
+    {
+      "id": "code-reviewer",
+      "displayName": "Code Reviewer",
+      "tier": "specialist",
+      "role": "review security",
+      "project": "mangos",
+      "origin": "directly_created",
+      "encounters": 12
+    },
+    {
+      "id": "log-scout",
+      "displayName": "Log Scout",
+      "tier": "sub",
+      "role": "log parsing",
+      "project": "mangos",
+      "origin": "seen_in_logs",
+      "encounters": 3
+    },
+    {
+      "id": "builder",
+      "displayName": "Builder",
+      "tier": "task",
+      "role": "coder implementer",
+      "project": "mangos",
+      "origin": "used",
+      "encounters": 25
+    },
+    {
+      "id": "prime-orchestra",
+      "displayName": "Maestro",
+      "tier": "prime",
+      "role": "orchestrator planner",
+      "project": "mangos",
+      "origin": "directly_created",
+      "encounters": 7,
+      "notes": "the flagship that runs the others"
+    }
+  ]
+}
