@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- mobile-first: lock zoom, respect the iPhone notch / home bar -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0712" />
+
+  <!-- iOS "Add to Home Screen" → runs full-screen like a native app -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Temple Hunters" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InJheSIgeDE9IjAiIHkxPSIxIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiICAgc3RvcC1jb2xvcj0iI2UyM2IyZSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuMTYiIHN0b3AtY29sb3I9IiNmMDhhMjUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZjJjZjFiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41IiBzdG9wLWNvbG9yPSIjM2ZiMjRhIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC42NiIgc3RvcC1jb2xvcj0iIzJmNmZlMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuODMiIHN0b3AtY29sb3I9IiM0YjMyYjAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiAgIHN0b3AtY29sb3I9IiM5YTNmZDYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iOTYiIGZpbGw9IiMwYTA3MTIiLz4KICA8IS0tIHB5cmFtaWQgb2Ygc2V2ZW4gc3RhY2tlZCBjb2xvciBsYXllcnMgLS0+CiAgPGc+CiAgICA8cG9seWdvbiBwb2ludHM9IjI1Niw5NiAzMDQsMTY4IDIwOCwxNjgiIGZpbGw9IiM5YTNmZDYiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjA4LDE2OCAzMDQsMTY4IDMyOCwyMjQgMTg0LDIyNCIgZmlsbD0iIzRiMzJiMCIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxODQsMjI0IDMyOCwyMjQgMzUyLDI4MCAxNjAsMjgwIiBmaWxsPSIjMmY2ZmUwIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE2MCwyODAgMzUyLDI4MCAzNzYsMzM2IDEzNiwzMzYiIGZpbGw9IiMzZmIyNGEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iMTM2LDMzNiAzNzYsMzM2IDQwMCwzOTIgMTEyLDM5MiIgZmlsbD0iI2YyY2YxYiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMTIsMzkyIDQwMCwzOTIgNDE2LDQzMiA5Niw0MzIiIGZpbGw9IiNmMDhhMjUiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iOTYsNDMyIDQxNiw0MzIgNDE2LDQzMiA5Niw0MzIiIGZpbGw9IiNlMjNiMmUiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iOTYsNDMyIDQxNiw0MzIgNDMyLDQ0OCA4MCw0NDgiIGZpbGw9IiNlMjNiMmUiLz4KICA8L2c+CiAgPCEtLSB3aGl0ZSBjYXBzdG9uZSBiZWFtIC0tPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjkyIiByPSIxNiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHg9IjI0MCIgeT0iMjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9InVybCgjcmF5KSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" />
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InJheSIgeDE9IjAiIHkxPSIxIiB4Mj0iMSIgeTI9IjAiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiICAgc3RvcC1jb2xvcj0iI2UyM2IyZSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuMTYiIHN0b3AtY29sb3I9IiNmMDhhMjUiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjMzIiBzdG9wLWNvbG9yPSIjZjJjZjFiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41IiBzdG9wLWNvbG9yPSIjM2ZiMjRhIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC42NiIgc3RvcC1jb2xvcj0iIzJmNmZlMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuODMiIHN0b3AtY29sb3I9IiM0YjMyYjAiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxIiAgIHN0b3AtY29sb3I9IiM5YTNmZDYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iOTYiIGZpbGw9IiMwYTA3MTIiLz4KICA8IS0tIHB5cmFtaWQgb2Ygc2V2ZW4gc3RhY2tlZCBjb2xvciBsYXllcnMgLS0+CiAgPGc+CiAgICA8cG9seWdvbiBwb2ludHM9IjI1Niw5NiAzMDQsMTY4IDIwOCwxNjgiIGZpbGw9IiM5YTNmZDYiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjA4LDE2OCAzMDQsMTY4IDMyOCwyMjQgMTg0LDIyNCIgZmlsbD0iIzRiMzJiMCIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxODQsMjI0IDMyOCwyMjQgMzUyLDI4MCAxNjAsMjgwIiBmaWxsPSIjMmY2ZmUwIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE2MCwyODAgMzUyLDI4MCAzNzYsMzM2IDEzNiwzMzYiIGZpbGw9IiMzZmIyNGEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iMTM2LDMzNiAzNzYsMzM2IDQwMCwzOTIgMTEyLDM5MiIgZmlsbD0iI2YyY2YxYiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMTIsMzkyIDQwMCwzOTIgNDE2LDQzMiA5Niw0MzIiIGZpbGw9IiNmMDhhMjUiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iOTYsNDMyIDQxNiw0MzIgNDE2LDQzMiA5Niw0MzIiIGZpbGw9IiNlMjNiMmUiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iOTYsNDMyIDQxNiw0MzIgNDMyLDQ0OCA4MCw0NDgiIGZpbGw9IiNlMjNiMmUiLz4KICA8L2c+CiAgPCEtLSB3aGl0ZSBjYXBzdG9uZSBiZWFtIC0tPgogIDxjaXJjbGUgY3g9IjI1NiIgY3k9IjkyIiByPSIxNiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHg9IjI0MCIgeT0iMjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9InVybCgjcmF5KSIgb3BhY2l0eT0iMC45Ii8+Cjwvc3ZnPg==" />
+  <title>Temple Hunters — Prism Ascent</title>
+  <style>
+/* ============================================================================
+ * Temple Hunters — style.css
+ * Mobile-first, dark "torch-lit temple" theme. Big tap targets, notch-safe.
+ * ========================================================================== */
+
+:root {
+  --bg: #0a0712;
+  --panel: #160f24;
+  --panel2: #1f1733;
+  --ink: #f3eaff;
+  --dim: #9a8cc0;
+  --line: #322747;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+}
+
+body {
+  padding: var(--safe-t) 0 var(--safe-b);
+  background:
+    radial-gradient(120% 80% at 50% -10%, #1b1030 0%, var(--bg) 60%);
+}
+
+/* ---------- screen system ---------- */
+.screen { display: none; min-height: 100%; padding: 14px; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ---------- title / end ---------- */
+.title-wrap {
+  margin: auto; text-align: center; max-width: 520px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.logo {
+  font-size: clamp(38px, 13vw, 76px); line-height: .92; margin: 0;
+  letter-spacing: 2px; font-weight: 900;
+  text-shadow: 0 0 18px rgba(154,63,214,.5);
+}
+.logo span {
+  background: linear-gradient(90deg,#e23b2e,#f08a25,#f2cf1b,#3fb24a,#2f6fe0,#4b32b0,#9a3fd6);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.logo.small { font-size: clamp(26px, 8vw, 44px); }
+.tag { letter-spacing: 8px; color: var(--dim); margin: -4px 0 0; font-size: 13px; }
+.ray-bar {
+  height: 8px; width: min(90%, 360px); border-radius: 6px;
+  background: linear-gradient(90deg,#e23b2e,#f08a25,#f2cf1b,#3fb24a,#2f6fe0,#4b32b0,#9a3fd6);
+  box-shadow: 0 0 16px rgba(154,63,214,.5);
+}
+.pitch { color: var(--ink); opacity: .9; line-height: 1.5; font-size: 14px; }
+.whisper {
+  color: #6f63a0; font-size: 12.5px; line-height: 1.6; font-style: italic;
+  max-width: 460px; border-top: 1px dashed var(--line); padding-top: 12px;
+  letter-spacing: .3px;
+}
+.hint { color: var(--dim); font-size: 12px; line-height: 1.5; }
+
+/* ---------- buttons ---------- */
+.big {
+  font-family: inherit; font-weight: 800; letter-spacing: 1px;
+  font-size: 18px; color: #120a1f;
+  background: linear-gradient(180deg,#ffe9a8,#f2cf1b);
+  border: 0; border-radius: 14px; padding: 16px 26px; cursor: pointer;
+  box-shadow: 0 6px 0 #9a7a00, 0 10px 22px rgba(0,0,0,.4);
+  min-height: 56px; touch-action: manipulation;
+}
+.big:active { transform: translateY(4px); box-shadow: 0 2px 0 #9a7a00; }
+.ghost {
+  font-family: inherit; background: var(--panel2); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px;
+  font-size: 14px; cursor: pointer; min-height: 46px;
+}
+.mute {
+  position: fixed; top: calc(var(--safe-t) + 8px); right: 10px; z-index: 50;
+  background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 12px; font-family: inherit; font-size: 12px;
+}
+
+/* ---------- top bar ---------- */
+.bar {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+  padding-top: 6px;
+}
+.bar h2 { margin: 0; font-size: 18px; letter-spacing: 2px; }
+
+/* ---------- roster ---------- */
+.roster {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  overflow-y: auto; padding-bottom: 8px;
+}
+@media (min-width: 520px) { .roster { grid-template-columns: repeat(3, 1fr); } }
+.card {
+  font-family: inherit; cursor: pointer; color: var(--ink);
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--c) 22%, var(--panel)) 0%, var(--panel) 70%);
+  border: 2px solid var(--c); border-radius: 16px;
+  padding: 12px 8px 10px; display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 0 0 1px #0006 inset, 0 6px 16px #0006;
+  min-height: 150px;
+}
+.card:active { transform: scale(.97); }
+.port { width: 96px; height: 96px; image-rendering: pixelated; }
+.cname { font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
+.csub { font-size: 11px; color: var(--dim); }
+.footnote, .footnote { color: var(--dim); font-size: 12px; line-height: 1.5; margin-top: 10px; }
+
+/* ---------- codex ---------- */
+.codex-body {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+  padding: 16px; overflow-y: auto; flex: 1;
+}
+.codex-port {
+  width: 128px; height: 128px; image-rendering: pixelated; display: block;
+  margin: 0 auto 10px;
+  filter: drop-shadow(0 6px 14px #0008);
+}
+.codex-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; }
+.codex-grid dt { color: var(--dim); font-size: 12px; white-space: nowrap; }
+.codex-grid dd { margin: 0; font-size: 13px; line-height: 1.4; }
+.blurb {
+  margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line);
+  font-style: italic; color: #d9ccff; line-height: 1.5; font-size: 13px;
+}
+.codex-actions { display: flex; gap: 10px; margin-top: 12px; align-items: stretch; }
+.codex-actions .big { flex: 1; }
+
+/* ---------- battle ---------- */
+.hud { display: flex; justify-content: center; margin-bottom: 6px; }
+.layer-tag {
+  font-size: 12px; letter-spacing: 2px; color: #ffe9a8;
+  background: #0006; border: 1px solid var(--line); border-radius: 999px;
+  padding: 5px 12px;
+}
+.hpbars { display: flex; }
+.hpbox {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 7px 10px; margin: 4px 0; width: 70%;
+}
+.hpbox.enemy { margin-left: auto; }
+.hprow { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+.hprow span:first-child { font-weight: 800; letter-spacing: 1px; }
+.track { height: 10px; background: #0008; border-radius: 6px; overflow: hidden; }
+.fill { height: 100%; width: 100%; transition: width .35s ease; background: #4fd06a; }
+
+.scene-wrap {
+  border: 2px solid var(--line); border-radius: 14px; overflow: hidden;
+  background: #05030a; margin: 4px 0;
+}
+#scene { display: block; width: 100%; image-rendering: pixelated; }
+
+.log {
+  background: #05030a; border: 1px solid var(--line); border-radius: 12px;
+  padding: 8px 12px; height: 74px; overflow-y: auto; font-size: 12.5px;
+  line-height: 1.45; margin: 4px 0;
+}
+.log p { margin: 0 0 3px; color: #cdbff2; }
+.log p:last-child { color: #fff; }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.act {
+  font-family: inherit; cursor: pointer; color: var(--ink);
+  background: var(--panel2); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px; display: flex; flex-direction: column; align-items: flex-start;
+  min-height: 58px; text-align: left;
+}
+.act:active { transform: translateY(2px); background: var(--panel); }
+.act span { font-weight: 800; letter-spacing: 1px; }
+.act small { color: var(--dim); font-size: 11px; margin-top: 2px; }
+.act.flee span { color: #ff9b9b; }
+
+</style>
+</head>
+<body>
+  <button id="mute" class="mute" aria-label="toggle sound">♪ ON</button>
+
+  <!-- ░░ TITLE ░░ -->
+  <section id="screen-title" class="screen active">
+    <div class="title-wrap">
+      <h1 class="logo">TEMPLE<br><span>HUNTERS</span></h1>
+      <p class="tag">PRISM ASCENT</p>
+      <div class="ray-bar"></div>
+      <p class="pitch">Seven creatures. Seven colors. Seven tones.<br>
+        Climb the seven stone layers of the pyramid and turn the spectrum back into white.</p>
+      <button id="start" class="big">▶ ENTER</button>
+      <p class="hint">Tip: on iPhone, tap <b>Share → Add to Home Screen</b> to play full-screen &amp; offline.</p>
+    </div>
+  </section>
+
+  <!-- ░░ SELECT ░░ -->
+  <section id="screen-select" class="screen">
+    <header class="bar"><h2>CHOOSE YOUR HUNTER</h2></header>
+    <div id="roster" class="roster"></div>
+    <p class="footnote">Each Hunter binds a color to a light frequency, a sound tone, a stone, a sacred shape, and a layer of the Great Pyramid. Tap one to read its codex.</p>
+  </section>
+
+  <!-- ░░ CODEX ░░ -->
+  <section id="screen-codex" class="screen">
+    <header class="bar">
+      <button id="codex-back" class="ghost">‹ back</button>
+      <h2 id="codex-title">HUNTER</h2>
+    </header>
+    <div id="codex-body" class="codex-body"></div>
+    <div class="codex-actions">
+      <button id="hear-tone" class="ghost">♪ Hear its tone</button>
+      <button id="choose" class="big">⛰ Begin the Ascent</button>
+    </div>
+  </section>
+
+  <!-- ░░ BATTLE ░░ -->
+  <section id="screen-battle" class="screen">
+    <div class="hud">
+      <div class="layer-tag" id="layer-tag">LAYER 1/7</div>
+    </div>
+    <div class="hpbars">
+      <div class="hpbox enemy">
+        <div class="hprow"><span id="e-name">—</span><span id="e-hp-text">0/0</span></div>
+        <div class="track"><div id="e-hp" class="fill"></div></div>
+      </div>
+    </div>
+    <div class="scene-wrap"><canvas id="scene"></canvas></div>
+    <div class="hpbars">
+      <div class="hpbox">
+        <div class="hprow"><span id="p-name">—</span><span id="p-hp-text">0/0</span></div>
+        <div class="track"><div id="p-hp" class="fill"></div></div>
+      </div>
+    </div>
+    <div id="log" class="log"></div>
+    <div id="actions" class="actions"></div>
+  </section>
+
+  <!-- ░░ END ░░ -->
+  <section id="screen-end" class="screen">
+    <div class="title-wrap">
+      <h1 id="end-title" class="logo small">—</h1>
+      <div class="ray-bar"></div>
+      <p id="end-msg" class="pitch"></p>
+      <p id="end-whisper" class="whisper"></p>
+      <button id="again" class="big">↺ Play again</button>
+    </div>
+  </section>
+  <script>
+/* ============================================================================
+ * TEMPLE HUNTERS — Prism Ascent
+ * data.js  —  The Seven Hunters
+ *
+ * Each Hunter encodes one strand of the "unified theory" the game is built on:
+ *   color  <->  light frequency (THz)  <->  solfeggio sound tone (Hz)
+ *          <->  stone / gem  <->  sacred geometry  <->  chakra
+ *          <->  a material layer historically carried to the Great Pyramid.
+ *
+ * This file is pure DATA. The sprite renderer (sprites.js) and the battle
+ * engine (game.js) both read from THE_SEVEN. Add an 8th creature here and it
+ * shows up everywhere automatically.
+ * ========================================================================== */
+
+const THE_SEVEN = [
+  {
+    id: 0,
+    name: "PYROKK",
+    title: "Guardian of the Root Layer",
+    colorName: "Red",
+    base: "#e23b2e", shade: "#9c1f1a", light: "#ff7a5e", gem: "#7a0d12",
+    chakra: "Muladhara — Root",
+    lightTHz: 430,           // visible red ~430 THz
+    toneHz: 396,             // solfeggio: liberating fear / grounding
+    note: "C",
+    stone: "Garnet / Bloodstone",
+    geometry: "Cube (Earth)",
+    pyramidLayer: "Aswan Red Granite — hauled ~900 km down the Nile for the King's Chamber",
+    ornament: "horns",
+    stats: { hp: 130, atk: 26, def: 22, spd: 12 },
+    moves: [
+      { name: "Stone Fist", power: 22, kind: "phys", text: "slams the bedrock" },
+      { name: "396 Tremor", power: 30, kind: "tone", text: "sounds the root tone — the floor shakes" }
+    ],
+    blurb: "Dense, patient, immovable. Pyrokk is the foundation everything else is stacked upon."
+  },
+  {
+    id: 1,
+    name: "EMBYRX",
+    title: "Guardian of the Sacral Layer",
+    colorName: "Orange",
+    base: "#f08a25", shade: "#a8530c", light: "#ffc06a", gem: "#7a3a00",
+    chakra: "Svadhisthana — Sacral",
+    lightTHz: 490,
+    toneHz: 417,             // solfeggio: undoing situations / change
+    note: "D",
+    stone: "Carnelian / Amber",
+    geometry: "Tetrahedron (Fire)",
+    pyramidLayer: "Basalt pavement — quarried at Widan el-Faras, dragged from the Fayum",
+    ornament: "ears",
+    stats: { hp: 112, atk: 24, def: 16, spd: 22 },
+    moves: [
+      { name: "Ember Dash", power: 20, kind: "phys", text: "darts in trailing sparks" },
+      { name: "417 Flux", power: 28, kind: "tone", text: "a tone of change unmakes the moment" }
+    ],
+    blurb: "Restless heat. Embyrx is motion, appetite, and the first spark of creation."
+  },
+  {
+    id: 2,
+    name: "SOLARA",
+    title: "Guardian of the Solar Layer",
+    colorName: "Yellow",
+    base: "#f2cf1b", shade: "#b6900a", light: "#fff27a", gem: "#7a5e00",
+    chakra: "Manipura — Solar Plexus",
+    lightTHz: 520,
+    toneHz: 528,             // solfeggio: the "miracle" / DNA repair tone
+    note: "E",
+    stone: "Citrine / Tiger's Eye",
+    geometry: "Octahedron (Air)",
+    pyramidLayer: "Core Limestone — the local Giza bedrock the mass was cut from",
+    ornament: "spikes",
+    stats: { hp: 118, atk: 25, def: 18, spd: 19 },
+    moves: [
+      { name: "Sun Lash", power: 21, kind: "phys", text: "a whip of focused light" },
+      { name: "528 Bloom", power: 29, kind: "tone", text: "the miracle tone — repairs and burns at once" }
+    ],
+    blurb: "Will and clarity. Solara is the noon power that drives the whole climb."
+  },
+  {
+    id: 3,
+    name: "VERDYN",
+    title: "Guardian of the Heart Layer",
+    colorName: "Green",
+    base: "#3fb24a", shade: "#1f7a2c", light: "#8cf08c", gem: "#0d5a1f",
+    chakra: "Anahata — Heart",
+    lightTHz: 560,
+    toneHz: 639,             // solfeggio: connection / relationships
+    note: "F",
+    stone: "Emerald / Malachite",
+    geometry: "Icosahedron (Water)",
+    pyramidLayer: "Copper & Malachite — mined in Sinai for the tools and seals",
+    ornament: "leaves",
+    stats: { hp: 140, atk: 21, def: 24, spd: 14 },
+    moves: [
+      { name: "Vine Bind", power: 19, kind: "phys", text: "roots coil and squeeze" },
+      { name: "639 Mend", power: 24, kind: "tone", text: "the heart tone — restores and links allies" }
+    ],
+    blurb: "The hinge of the spectrum. Verdyn heals, binds, and holds the party together."
+  },
+  {
+    id: 4,
+    name: "AZULON",
+    title: "Guardian of the Throat Layer",
+    colorName: "Blue",
+    base: "#2f6fe0", shade: "#163f96", light: "#7aa8ff", gem: "#0d245a",
+    chakra: "Vishuddha — Throat",
+    lightTHz: 640,
+    toneHz: 741,             // solfeggio: expression / awakening intuition
+    note: "G",
+    stone: "Sapphire / Turquoise",
+    geometry: "Dodecahedron (Aether)",
+    pyramidLayer: "Tura White Limestone & Sinai Turquoise — the casing ferried across the Nile",
+    ornament: "fins",
+    stats: { hp: 120, atk: 23, def: 19, spd: 20 },
+    moves: [
+      { name: "Tide Cut", power: 20, kind: "phys", text: "a clean blade of water" },
+      { name: "741 Word", power: 28, kind: "tone", text: "the throat tone — sound made into force" }
+    ],
+    blurb: "Voice and flow. Azulon turns intention into vibration you can feel."
+  },
+  {
+    id: 5,
+    name: "INDIGOS",
+    title: "Guardian of the Brow Layer",
+    colorName: "Indigo",
+    base: "#4b32b0", shade: "#2a1a73", light: "#9a7aff", gem: "#16093f",
+    chakra: "Ajna — Third Eye",
+    lightTHz: 680,
+    toneHz: 852,             // solfeggio: returning to spiritual order
+    note: "A",
+    stone: "Amethyst / Lapis Lazuli",
+    geometry: "Merkaba (Star Tetrahedron)",
+    pyramidLayer: "Dolerite & Diorite — the hard pounders from the Eastern Desert that shaped the granite",
+    ornament: "antennae",
+    stats: { hp: 116, atk: 27, def: 17, spd: 21 },
+    moves: [
+      { name: "Mind Spike", power: 22, kind: "phys", text: "a lance of pure focus" },
+      { name: "852 Sight", power: 30, kind: "tone", text: "the brow tone — sees the strike before it lands" }
+    ],
+    blurb: "Perception and pattern. Indigos reads the lattice connecting every layer below."
+  },
+  {
+    id: 6,
+    name: "VIOLETTE",
+    title: "Guardian of the Crown Layer",
+    colorName: "Violet",
+    base: "#9a3fd6", shade: "#5e1f96", light: "#d79aff", gem: "#3a0d5a",
+    chakra: "Sahasrara — Crown",
+    lightTHz: 750,           // visible violet ~750 THz
+    toneHz: 963,             // solfeggio: oneness / the crown tone
+    note: "B",
+    stone: "Selenite / Sugilite",
+    geometry: "Flower of Life (Sphere)",
+    pyramidLayer: "Egyptian Alabaster & the Gold Pyramidion — the calcite and capstone that crowned the apex",
+    ornament: "halo",
+    stats: { hp: 124, atk: 26, def: 20, spd: 18 },
+    moves: [
+      { name: "Prism Touch", power: 21, kind: "phys", text: "all seven colors in one strike" },
+      { name: "963 Crown", power: 31, kind: "tone", text: "the crown tone — the spectrum closes into white" }
+    ],
+    blurb: "The capstone. Violette is where the seven rays converge back into a single light."
+  }
+];
+
+/* Type chart — the color wheel as a balanced cycle.
+ * Each Hunter is strong against the color 3 steps ahead and weak to 3 behind. */
+function effectiveness(attackerId, defenderId) {
+  if (attackerId === defenderId) return 1.0;
+  const fwd = ((defenderId - attackerId) + 7) % 7; // 1..6
+  return (fwd >= 1 && fwd <= 3) ? 1.5 : 0.75;
+}
+
+/* ============================================================================
+ * THE HIDDEN TIERS — 8, 9, and the Void.
+ *
+ * The seven are the visible spectrum. Beyond them the structure keeps going,
+ * hidden yet always there to be researched, measured, and held loosely toward
+ * the truth. These are NOT in the roster. They surface only as whispers (for
+ * now) — the design space the whole game eventually grows into.
+ *
+ *   8 — UNITY      : all seven held as one. White light. The octave. ∞ upright.
+ *   9 — OUROBOROS  : the dragon eating its tail. The dark cycle, eternal return,
+ *                    the shadow that must rise to be seen by the light.
+ *   0 — THE VOID   : the Nothing. Outside polarity entirely. Forgetting,
+ *                    un-creation — and the single grain that rebuilds it all.
+ * ========================================================================== */
+const THE_HIDDEN = [
+  {
+    glyph: "8", key: "unity",
+    name: "AUREON", title: "The Eighth — Unity",
+    base: "#ffffff", shade: "#cfc4ff", light: "#ffffff", gem: "#bfa8ff",
+    chakra: "Soul Star — the 8th center, above the crown",
+    light_: "Full-spectrum white — all seven rays converged",
+    toneHz: 792,            // octave of the 396 root: the spiral returns home, higher
+    note: "G (octave)",
+    stone: "Clear Quartz / Diamond / Pearl (the stone that holds all stones)",
+    geometry: "The completed Flower of Life — the pyramid whole, base rejoined to capstone",
+    meaning:
+      "Not an eighth creature but the seven remembered as one organism — the " +
+      "collective consciousness, magnetism in the bone, the prism reassembled " +
+      "into a single living light. The polar opposite of the Ninth.",
+    blurb: "When the seven stop holding the weight separately and become one, the spectrum closes to white."
+  },
+  {
+    glyph: "9", key: "ouroboros",
+    name: "OUROBOS", title: "The Ninth — The Tail-Eater",
+    base: "#0c0a14", shade: "#1a1530", light: "#3a2f5e", gem: "#5e1f96",
+    chakra: "Earth Star — below the feet, the root of the root",
+    light_: "No light returned — the swallowing dark that defines the edge of all light",
+    toneHz: 198,            // sub-octave below the 396 root: the drone beneath
+    note: "G (sub-octave)",
+    stone: "Obsidian / Onyx / Black Tourmaline / Shungite",
+    geometry: "The Ouroboros ring — the torus, the lemniscate ∞ laid down, the spiral that returns",
+    meaning:
+      "The dragon eating its tail. Not evil — the necessary dark, the cocoon, " +
+      "the night before dawn, eternal return. The turbulence you ride before " +
+      "the resync. All shadow either rises into the light or is blinded by it.",
+    blurb: "The cycle that must be ridden. Darkness that exists so the night can finally see the Light."
+  },
+  {
+    glyph: "0", key: "void",
+    name: "THE NOTHING", title: "The Void — Null",
+    base: "#000000", shade: "#000000", light: "#0a0a0a", gem: "#101010",
+    chakra: "None — the absence of center",
+    light_: "Neither light nor dark — the un-being that erases the question itself",
+    toneHz: 0,             // silence. the tone that is no tone.
+    note: "— (silence)",
+    stone: "None — the stone that was never quarried",
+    geometry: "Null — outside the spiral, outside the ring, outside the seven",
+    meaning:
+      "Not the Ninth's productive darkness but the absence of story itself — " +
+      "forgetting, despair, the un-creation. It spreads where dreaming stops; " +
+      "selfish wishes feed it by trading away memory. (The Nothing, of the " +
+      "Neverending tale.) Its only answer is a single grain of imagination — " +
+      "one name, one remembered thing — from which all of it is rebuilt.",
+    blurb: "The Emptiness that forgets. A single grain of sand, named and remembered, undoes it."
+  }
+];
+
+if (typeof module !== "undefined") module.exports = { THE_SEVEN, THE_HIDDEN, effectiveness };
+if (typeof window !== "undefined") { window.THE_SEVEN = THE_SEVEN; window.THE_HIDDEN = THE_HIDDEN; }
+
+
+//
+/* ============================================================================
+ * audio.js — tiny WebAudio engine.
+ *
+ * The whole point of the "frequency/color/sound" theory is that you can HEAR
+ * it. So a Hunter's signature ("tone") move actually plays its solfeggio
+ * frequency. Basic moves get a short blippy hit. No audio files — it's all
+ * synthesized, and it stays silent until the player taps once (iOS rule).
+ * ========================================================================== */
+
+const Audio7 = (() => {
+  let ctx = null;
+  let enabled = true;
+
+  function ensure() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ctx = new AC();
+    }
+    if (ctx && ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+
+  // a sustained, gentle pad at `freq` Hz — used for signature "tone" moves
+  function tone(freq, dur = 1.1) {
+    if (!enabled) return;
+    const ac = ensure(); if (!ac) return;
+    const now = ac.currentTime;
+    const gain = ac.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.06);
+    gain.gain.exponentialRampToValueAtTime(0.0008, now + dur);
+    gain.connect(ac.destination);
+
+    // a sine carrier plus a soft fifth for body
+    [ [freq, "sine", 1], [freq * 1.5, "sine", 0.35], [freq * 2, "triangle", 0.15] ]
+      .forEach(([f, type, amp]) => {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = type; o.frequency.value = f; g.gain.value = amp;
+        o.connect(g); g.connect(gain);
+        o.start(now); o.stop(now + dur);
+      });
+  }
+
+  // a short percussive hit — used for physical moves
+  function hit(base = 220) {
+    if (!enabled) return;
+    const ac = ensure(); if (!ac) return;
+    const now = ac.currentTime;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = "square";
+    o.frequency.setValueAtTime(base, now);
+    o.frequency.exponentialRampToValueAtTime(base * 0.5, now + 0.12);
+    g.gain.setValueAtTime(0.16, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    o.connect(g); g.connect(ac.destination);
+    o.start(now); o.stop(now + 0.18);
+  }
+
+  // a tiny UI click
+  function blip(freq = 660) {
+    if (!enabled) return;
+    const ac = ensure(); if (!ac) return;
+    const now = ac.currentTime;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = "square"; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    o.connect(g); g.connect(ac.destination);
+    o.start(now); o.stop(now + 0.09);
+  }
+
+  // ascending arpeggio of all seven tones — victory sting
+  function spectrum(freqs) {
+    if (!enabled) return;
+    freqs.forEach((f, i) => setTimeout(() => tone(f, 0.5), i * 130));
+  }
+
+  return {
+    unlock: ensure,
+    tone, hit, blip, spectrum,
+    toggle() { enabled = !enabled; return enabled; },
+    get enabled() { return enabled; }
+  };
+})();
+
+if (typeof window !== "undefined") window.Audio7 = Audio7;
+
+//
+/* ============================================================================
+ * sprites.js — Procedural 8/16-bit creature renderer.
+ *
+ * No image files. Every Hunter is drawn from its data (color + ornament) onto
+ * a tiny virtual grid, then blown up with smoothing OFF so the pixels stay
+ * crisp and chunky. This keeps the whole game to plain text files — perfect
+ * for dropping on a phone — while still reading as pixel art.
+ * ========================================================================== */
+
+const GRID = 16; // creatures live on a 16x16 virtual grid
+
+// shade a hex color by amt (-1..1)
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const f = amt < 0 ? 0 : 255, t = Math.abs(amt);
+  r = Math.round(r + (f - r) * t);
+  g = Math.round(g + (f - g) * t);
+  b = Math.round(b + (f - b) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+// fill one virtual pixel
+function px(ctx, ox, oy, cell, gx, gy, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(ox + gx * cell, oy + gy * cell, cell, cell);
+}
+
+// distance helper for the rounded body
+function inEllipse(gx, gy, cx, cy, rx, ry) {
+  const dx = (gx - cx) / rx, dy = (gy - cy) / ry;
+  return dx * dx + dy * dy <= 1;
+}
+
+/* Draw a Hunter centered in a box of `size` device pixels.
+ * frame: integer tick used for idle bob + blink. facing: 1 right, -1 left. */
+function drawHunter(ctx, hunter, x, y, size, frame, facing) {
+  facing = facing || 1;
+  const cell = Math.max(1, Math.floor(size / GRID));
+  const used = cell * GRID;
+  const ox = Math.floor(x + (size - used) / 2);
+  const bob = Math.round(Math.sin(frame / 14) * 1) * cell; // gentle float
+  const oy = Math.floor(y + (size - used) / 2) + bob;
+
+  const outline = shade(hunter.shade, -0.45);
+  const body = hunter.base;
+  const belly = hunter.light;
+  const dark = hunter.shade;
+
+  ctx.save();
+  if (facing < 0) { ctx.translate(ox * 2 + used, 0); ctx.scale(-1, 1); }
+  const bx = facing < 0 ? 0 : ox;
+
+  // ---- ornament behind body (wings/halo/horns drawn first where needed) ----
+  drawOrnamentBack(ctx, hunter, bx, oy, cell, outline, body, dark);
+
+  // ---- body: a rounded blob ----
+  const cx = 8, cy = 9, rx = 5.2, ry = 5.6;
+  for (let gy = 0; gy < GRID; gy++) {
+    for (let gx = 0; gx < GRID; gx++) {
+      if (!inEllipse(gx, gy, cx, cy, rx, ry)) continue;
+      // outline ring
+      const edge = !inEllipse(gx, gy, cx, cy, rx - 0.9, ry - 0.9);
+      if (edge) { px(ctx, bx, oy, cell, gx, gy, outline); continue; }
+      // belly highlight lower-front, shadow upper-back
+      let c = body;
+      if (gy > cy && inEllipse(gx, gy, cx + 1.2, cy + 1.6, rx - 2.2, ry - 2.4)) c = belly;
+      else if (gy < cy - 1) c = dark;
+      px(ctx, bx, oy, cell, gx, gy, c);
+    }
+  }
+
+  // ---- forehead gem (diamond) ----
+  const gemX = 8, gemY = 4;
+  px(ctx, bx, oy, cell, gemX, gemY, hunter.gem);
+  px(ctx, bx, oy, cell, gemX, gemY - 1, shade(hunter.gem, 0.5));
+  px(ctx, bx, oy, cell, gemX - 1, gemY, hunter.gem);
+  px(ctx, bx, oy, cell, gemX + 1, gemY, shade(hunter.gem, -0.2));
+  px(ctx, bx, oy, cell, gemX, gemY + 1, hunter.gem);
+
+  // ---- eyes (blink every ~3s) ----
+  const blink = (frame % 180) < 8;
+  const eyeY = 7;
+  for (const ex of [6, 10]) {
+    if (blink) {
+      px(ctx, bx, oy, cell, ex, eyeY, outline); // closed: a single dark line
+    } else {
+      px(ctx, bx, oy, cell, ex, eyeY, "#ffffff");     // white of the eye
+      px(ctx, bx, oy, cell, ex, eyeY - 1, "#ffffff");
+      px(ctx, bx, oy, cell, ex, eyeY, "#222");         // pupil overwrites center
+    }
+  }
+
+  // tiny feet
+  px(ctx, bx, oy, cell, 5, 14, dark);
+  px(ctx, bx, oy, cell, 10, 14, dark);
+
+  // ---- ornament in front ----
+  drawOrnamentFront(ctx, hunter, bx, oy, cell, outline, body, belly, dark);
+
+  ctx.restore();
+}
+
+function drawOrnamentBack(ctx, h, bx, oy, cell, outline, body, dark) {
+  if (h.ornament === "halo") {
+    // glowing ring above the head
+    const ring = shade(h.light, 0.3);
+    for (const [gx, gy] of [[5,1],[6,0],[7,0],[8,0],[9,0],[10,1]]) {
+      px(ctx, bx, oy, cell, gx, gy, ring);
+    }
+  }
+  if (h.ornament === "fins") {
+    for (const [gx, gy] of [[1,9],[1,10],[1,11],[2,12]]) px(ctx, bx, oy, cell, gx, gy, dark);
+  }
+}
+
+function drawOrnamentFront(ctx, h, bx, oy, cell, outline, body, belly, dark) {
+  const C = shade(h.base, -0.15);
+  switch (h.ornament) {
+    case "horns":
+      for (const [gx, gy] of [[4,3],[3,2],[3,1],[12,3],[13,2],[13,1]])
+        px(ctx, bx, oy, cell, gx, gy, dark);
+      break;
+    case "ears":
+      for (const [gx, gy] of [[4,2],[4,1],[5,1],[12,2],[12,1],[11,1]])
+        px(ctx, bx, oy, cell, gx, gy, C);
+      px(ctx, bx, oy, cell, 4, 2, belly);
+      px(ctx, bx, oy, cell, 12, 2, belly);
+      break;
+    case "spikes":
+      for (const [gx, gy] of [[6,2],[8,1],[10,2],[5,3],[11,3]])
+        px(ctx, bx, oy, cell, gx, gy, belly);
+      break;
+    case "leaves":
+      for (const [gx, gy] of [[7,1],[8,0],[9,1],[6,2],[10,2]])
+        px(ctx, bx, oy, cell, gx, gy, shade(h.base, 0.2));
+      break;
+    case "fins":
+      for (const [gx, gy] of [[14,8],[14,9],[14,10],[13,11],[2,8]])
+        px(ctx, bx, oy, cell, gx, gy, belly);
+      break;
+    case "antennae":
+      for (const [gx, gy] of [[6,2],[6,1],[10,2],[10,1]])
+        px(ctx, bx, oy, cell, gx, gy, dark);
+      px(ctx, bx, oy, cell, 6, 0, h.gem);
+      px(ctx, bx, oy, cell, 10, 0, h.gem);
+      break;
+    case "halo":
+      // wings to the sides for the crown creature
+      for (const [gx, gy] of [[2,8],[1,9],[1,10],[14,8],[15,9],[15,10]])
+        px(ctx, bx, oy, cell, gx, gy, shade(h.light, 0.2));
+      break;
+  }
+}
+
+/* Build a reusable canvas "portrait" of a hunter (for roster cards). */
+function hunterPortrait(hunter, sizePx) {
+  const c = document.createElement("canvas");
+  c.width = c.height = sizePx;
+  const ctx = c.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  drawHunter(ctx, hunter, 0, 0, sizePx, 0, 1);
+  return c;
+}
+
+if (typeof window !== "undefined") {
+  window.Sprites = { drawHunter, hunterPortrait, shade };
+}
+
+//
+/* ============================================================================
+ * game.js — screens, roster, and the turn-based battle engine.
+ *
+ * THE LOOP (MVP / vertical slice):
+ *   Title  ->  Choose your Hunter  ->  Codex (lore + the unified-theory map)
+ *          ->  Ascend the 7 layers of the pyramid, one guardian per layer.
+ * Beat all seven layers and the spectrum closes into white = you win.
+ *
+ * Everything is data-driven from THE_SEVEN, so this same engine grows straight
+ * into the bigger party game later.
+ * ========================================================================== */
+
+(() => {
+  const $ = (sel) => document.querySelector(sel);
+  const screens = {};
+  let player = null;       // chosen hunter (battle copy)
+  let enemy = null;        // current guardian (battle copy)
+  let layer = 0;           // which pyramid layer we're climbing (0..6)
+  let busy = false;        // lock input during animations
+  let frame = 0;
+
+  // ---- battle canvas ----
+  const canvas = $("#scene");
+  const ctx = canvas.getContext("2d");
+
+  function fitCanvas() {
+    const wrap = canvas.parentElement;
+    const w = wrap.clientWidth;
+    const h = Math.round(w * 0.62);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    canvas._w = w; canvas._h = h;
+  }
+  window.addEventListener("resize", fitCanvas);
+
+  // make a fresh battle copy with current HP
+  function spawn(def) {
+    return JSON.parse(JSON.stringify({ ...def, hp: def.stats.hp, maxhp: def.stats.hp }));
+  }
+
+  /* ---------------------------------------------------------------- screens */
+  function show(name) {
+    Object.values(screens).forEach((s) => s.classList.remove("active"));
+    screens[name].classList.add("active");
+    if (name === "battle") { fitCanvas(); }
+  }
+
+  function buildRoster() {
+    const grid = $("#roster");
+    grid.innerHTML = "";
+    THE_SEVEN.forEach((h) => {
+      const card = document.createElement("button");
+      card.className = "card";
+      card.style.setProperty("--c", h.base);
+      card.style.setProperty("--c2", h.shade);
+      const port = Sprites.hunterPortrait(h, 96);
+      port.className = "port";
+      card.appendChild(port);
+      const nm = document.createElement("div");
+      nm.className = "cname";
+      nm.textContent = h.name;
+      const sub = document.createElement("div");
+      sub.className = "csub";
+      sub.textContent = h.colorName + " · " + h.toneHz + "Hz";
+      card.appendChild(nm); card.appendChild(sub);
+      card.addEventListener("click", () => { Audio7.blip(520 + h.id * 40); openCodex(h); });
+      grid.appendChild(card);
+    });
+  }
+
+  /* ------------------------------------------------------------------ codex */
+  function openCodex(h) {
+    const c = $("#codex-body");
+    const port = Sprites.hunterPortrait(h, 128);
+    port.className = "codex-port";
+    c.innerHTML = "";
+    c.appendChild(port);
+    const rows = [
+      ["Title", h.title],
+      ["Color → Light", `${h.colorName} · ~${h.lightTHz} THz`],
+      ["Sound (Solfeggio)", `${h.toneHz} Hz · note ${h.note}`],
+      ["Chakra", h.chakra],
+      ["Stone / Gem", h.stone],
+      ["Sacred Geometry", h.geometry],
+      ["Pyramid Layer", h.pyramidLayer],
+    ];
+    const dl = document.createElement("dl");
+    dl.className = "codex-grid";
+    rows.forEach(([k, v]) => {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    const blurb = document.createElement("p");
+    blurb.className = "blurb";
+    blurb.textContent = h.blurb;
+    c.appendChild(dl); c.appendChild(blurb);
+
+    $("#codex-title").textContent = h.name;
+    $("#codex-title").style.color = h.base;
+    $("#hear-tone").onclick = () => Audio7.tone(h.toneHz, 1.4);
+    $("#choose").onclick = () => startRun(h);
+    show("codex");
+  }
+
+  /* -------------------------------------------------------------- battle run */
+  function startRun(h) {
+    player = spawn(h);
+    layer = 0;
+    nextLayer();
+  }
+
+  function nextLayer() {
+    // the guardian of each layer is the hunter whose color owns that layer,
+    // skipping the player's own color (you don't fight yourself — you ARE it).
+    let guardianId = layer;
+    if (guardianId === player.id) guardianId = (guardianId + 1) % 7;
+    const g = spawn(THE_SEVEN[guardianId]);
+    // guardians get tougher as you ascend
+    const buff = 1 + layer * 0.035;
+    g.maxhp = Math.round(g.maxhp * buff);
+    g.hp = g.maxhp;
+    g.stats = { ...g.stats, atk: Math.round(g.stats.atk * buff) };
+    enemy = g;
+    player.hp = player.maxhp; // full heal between layers (MVP kindness)
+    setupBattle();
+  }
+
+  function setupBattle() {
+    show("battle");
+    $("#layer-tag").textContent =
+      `LAYER ${layer + 1}/7 — ${enemy.pyramidLayer.split(" — ")[0]}`;
+    log(`A wild ${enemy.name} guards the ${enemy.colorName} layer!`, true);
+    buildActions();
+    updateBars();
+  }
+
+  function buildActions() {
+    const box = $("#actions");
+    box.innerHTML = "";
+    player.moves.forEach((m, i) => {
+      const b = document.createElement("button");
+      b.className = "act";
+      b.innerHTML = `<span>${m.name}</span><small>${m.kind === "tone" ? m.power + " · " + player.toneHz + "Hz" : "PWR " + m.power}</small>`;
+      b.onclick = () => { if (!busy) playerTurn(i); };
+      box.appendChild(b);
+    });
+    const attune = document.createElement("button");
+    attune.className = "act";
+    attune.innerHTML = `<span>Attune</span><small>heal + brace · ${player.toneHz}Hz</small>`;
+    attune.onclick = () => { if (!busy) playerAttune(); };
+    box.appendChild(attune);
+
+    const flee = document.createElement("button");
+    flee.className = "act flee";
+    flee.innerHTML = "<span>Retreat</span><small>back to roster</small>";
+    flee.onclick = () => { if (!busy) { Audio7.blip(200); show("select"); } };
+    box.appendChild(flee);
+  }
+
+  /* ----------------------------------------------------------- damage model */
+  function damage(attacker, defender, move) {
+    const eff = effectiveness(attacker.id, defender.id);
+    const atk = attacker.stats.atk;
+    const def = defender.stats.def;
+    let base = (move.power * (atk / 22)) * (1 - def / (def + 70)) * eff;
+    if (defender === player) base *= 0.80;          // hero takes a little less
+    if (defender.guarding) { base *= 0.5; defender.guarding = false; } // braced
+    const variance = 0.85 + Math.random() * 0.3;
+    const dmg = Math.max(1, Math.round(base * variance));
+    return { dmg, eff };
+  }
+
+  function playerTurn(moveIndex) {
+    busy = true;
+    const move = player.moves[moveIndex];
+    sound(player, move);
+    flash(move.kind === "tone" ? player.base : "#fff", "enemy");
+    const { dmg, eff } = damage(player, enemy, move);
+    enemy.hp = Math.max(0, enemy.hp - dmg);
+    log(`${player.name} used ${move.name} — ${move.text}.`);
+    log(effLine(eff, dmg));
+    updateBars();
+
+    setTimeout(() => {
+      if (enemy.hp <= 0) return onEnemyDown();
+      enemyTurn();
+    }, 850);
+  }
+
+  function playerAttune() {
+    busy = true;
+    const healed = Math.round(player.maxhp * 0.30);
+    player.hp = Math.min(player.maxhp, player.hp + healed);
+    player.guarding = true; // halves the next hit taken
+    Audio7.tone(player.toneHz, 1.2);
+    flash(player.light, "player");
+    log(`${player.name} attunes to ${player.toneHz}Hz — recovers ${healed} HP and braces.`);
+    updateBars();
+    setTimeout(() => {
+      if (player.hp <= 0) return onPlayerDown();
+      enemyTurn();
+    }, 850);
+  }
+
+  function enemyTurn() {
+    // simple AI: prefer the signature tone move when it would be effective
+    const eff = effectiveness(enemy.id, player.id);
+    const move = eff >= 1 ? enemy.moves[1] : enemy.moves[Math.floor(Math.random() * 2)];
+    sound(enemy, move);
+    flash(move.kind === "tone" ? enemy.base : "#fff", "player");
+    const r = damage(enemy, player, move);
+    player.hp = Math.max(0, player.hp - r.dmg);
+    log(`${enemy.name} used ${move.name}!`);
+    log(effLine(r.eff, r.dmg));
+    updateBars();
+
+    setTimeout(() => {
+      if (player.hp <= 0) return onPlayerDown();
+      busy = false;
+    }, 850);
+  }
+
+  function onEnemyDown() {
+    Audio7.spectrum([enemy.toneHz, enemy.toneHz * 1.25]);
+    log(`${enemy.name} fades back into the stone.`, true);
+    layer++;
+    setTimeout(() => {
+      if (layer >= 7) return onVictory();
+      log(`You ascend to layer ${layer + 1}…`);
+      setTimeout(() => { busy = false; nextLayer(); }, 700);
+    }, 700);
+  }
+
+  function onVictory() {
+    Audio7.spectrum(THE_SEVEN.map((h) => h.toneHz));
+    const unity = THE_HIDDEN.find((h) => h.key === "unity");
+    const ninth = THE_HIDDEN.find((h) => h.key === "ouroboros");
+    const voidT = THE_HIDDEN.find((h) => h.key === "void");
+    $("#end-title").textContent = "THE SPECTRUM CLOSES";
+    $("#end-title").style.color = "#fff";
+    $("#end-msg").textContent =
+      `${player.name} carried all seven rays to the capstone. The seven tones ring as one — and for a moment they are not seven but ${unity.name}, the Eighth: a single living light.`;
+    // a whisper of what waits beyond the seven
+    $("#end-whisper").textContent =
+      `…beneath it the ${ninth.name} stirs — the tail-eater, the dark cycle that must be ridden. ` +
+      `And further out, past light and dark alike, ${voidT.name} forgets. ` +
+      `One grain, named and remembered, holds it all open.`;
+    show("end");
+    busy = false;
+  }
+
+  function onPlayerDown() {
+    $("#end-title").textContent = "THE CLIMB ENDS";
+    $("#end-msg").textContent =
+      `${player.name} fell at layer ${layer + 1}. The pyramid keeps its secret… for now.`;
+    show("end");
+    busy = false;
+  }
+
+  /* --------------------------------------------------------------- helpers */
+  function effLine(eff, dmg) {
+    let tag = "";
+    if (eff > 1) tag = " It resonates — super effective!";
+    else if (eff < 1) tag = " It's dissonant — not very effective.";
+    return `…${dmg} damage.${tag}`;
+  }
+
+  function sound(who, move) {
+    if (move.kind === "tone") Audio7.tone(who.toneHz, 1.0);
+    else Audio7.hit(160 + who.id * 20);
+  }
+
+  let flashFx = null;
+  function flash(color, target) { flashFx = { color, target, t: 12 }; }
+
+  function log(text, clear) {
+    const el = $("#log");
+    if (clear) el.innerHTML = "";
+    const p = document.createElement("p");
+    p.textContent = text;
+    el.appendChild(p);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function bar(el, cur, max) {
+    const pct = Math.max(0, (cur / max) * 100);
+    el.style.width = pct + "%";
+    el.style.background = pct > 50 ? "#4fd06a" : pct > 22 ? "#f2cf1b" : "#e23b2e";
+  }
+
+  function updateBars() {
+    $("#p-name").textContent = player.name;
+    $("#e-name").textContent = enemy.name;
+    $("#p-hp-text").textContent = `${player.hp}/${player.maxhp}`;
+    $("#e-hp-text").textContent = `${enemy.hp}/${enemy.maxhp}`;
+    bar($("#p-hp"), player.hp, player.maxhp);
+    bar($("#e-hp"), enemy.hp, enemy.maxhp);
+  }
+
+  /* ----------------------------------------------------------- render loop */
+  function render() {
+    frame++;
+    if (screens.battle.classList.contains("active") && enemy && player) {
+      const w = canvas._w, h = canvas._h;
+      // backdrop: gradient tinted toward the current layer's color
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, Sprites.shade(enemy.shade, -0.25));
+      g.addColorStop(1, "#0a0712");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      drawPyramidBands(w, h);
+
+      const size = Math.min(w * 0.34, 150);
+      // enemy upper-right, player lower-left
+      Sprites.drawHunter(ctx, enemy, w - size - w * 0.06, h * 0.10, size, frame, -1);
+      Sprites.drawHunter(ctx, player, w * 0.06, h - size - h * 0.06, size, frame + 30, 1);
+
+      if (flashFx && flashFx.t > 0) {
+        ctx.fillStyle = flashFx.color;
+        ctx.globalAlpha = flashFx.t / 24;
+        const s = Math.min(w * 0.34, 150);
+        if (flashFx.target === "enemy") ctx.fillRect(w - s - w * 0.06, h * 0.10, s, s);
+        else ctx.fillRect(w * 0.06, h - s - h * 0.06, s, s);
+        ctx.globalAlpha = 1;
+        flashFx.t--;
+      }
+    }
+    requestAnimationFrame(render);
+  }
+
+  // faint horizontal bands evoking the seven stacked stone layers
+  function drawPyramidBands(w, h) {
+    for (let i = 0; i < 7; i++) {
+      ctx.fillStyle = THE_SEVEN[i].base;
+      ctx.globalAlpha = 0.05;
+      ctx.fillRect(0, (h / 7) * i, w, h / 7 - 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* -------------------------------------------------------------- bootstrap */
+  function init() {
+    ["title", "select", "codex", "battle", "end"].forEach(
+      (n) => (screens[n] = $("#screen-" + n))
+    );
+    buildRoster();
+
+    $("#start").onclick = () => { Audio7.unlock(); Audio7.blip(700); show("select"); };
+    $("#codex-back").onclick = () => { Audio7.blip(300); show("select"); };
+    $("#again").onclick = () => { Audio7.blip(600); show("select"); };
+    $("#mute").onclick = (e) => {
+      const on = Audio7.toggle();
+      e.currentTarget.textContent = on ? "♪ ON" : "♪ OFF";
+    };
+
+    fitCanvas();
+    show("title");
+    render();
+  }
+
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+  </script>
+  </body>
+</html>

@@ -17,14 +17,25 @@ seven-row mapping table.
 ## ▶ How to play it on your iPhone (primary target)
 
 The whole game is plain HTML/CSS/JS — no build step, no app store, no Xcode.
-Three ways, easiest first:
+Four ways, easiest first:
 
-### 1. GitHub Pages (best — a real link you tap on your phone)
+### 0. One file, straight to your phone (fastest — no hosting, no account)
+`temple-hunters-standalone.html` (in the repo root, one folder up) is the **entire
+game inlined into a single file**. Get it onto the iPhone any way you like:
+- **AirDrop** it from your Mac → choose **Save to Files** → tap it → it opens in
+  Safari and plays. (Then Share → Add to Home Screen to keep it.)
+- or email/AirDrop it to yourself, or drop it in iCloud Drive / Files.
+
+Rebuild it any time after editing the source:
+```bash
+cd temple-hunters && node build-standalone.js   # → ../temple-hunters-standalone.html
+```
+
+### 1. GitHub Pages (best for a permanent tappable link)
 1. On GitHub: **Settings → Pages → Build from branch**, pick this branch and
-   `/ (root)` (or the `temple-hunters` folder if Pages lets you).
-2. Open the published URL in **Safari** on your iPhone.
-3. Tap **Share → Add to Home Screen**. Now it launches **full-screen and works
-   offline**, just like a native app. 🎮
+   `/ (root)`.
+2. Open `https://sparkey333.github.io/mangos/temple-hunters/` in **Safari**.
+3. Tap **Share → Add to Home Screen** → full-screen, offline, native-feeling. 🎮
 
 ### 2. Any quick web host
 Drag the `temple-hunters/` folder into [netlify.com/drop](https://app.netlify.com/drop)
@@ -69,8 +80,13 @@ temple-hunters/
 │   ├── sprites.js          # procedural 16×16 pixel-art creature renderer
 │   ├── audio.js            # WebAudio solfeggio tones (you HEAR each frequency)
 │   └── game.js             # screens + turn-based battle engine
-├── LORE.md                 # the full unified-theory mapping table
+├── build-standalone.js     # inlines everything → ../temple-hunters-standalone.html
+├── LORE.md                 # the full unified-theory mapping table (incl. 8/9/0)
+├── LORE_VAULT.md           # poem/song/lyric/riff seed material
+├── DESIGN.md               # evolution tiers (Djinn-style) + enemy/boss bestiary
 └── README.md
+
+temple-hunters-standalone.html  # ← single-file build (repo root) for phone testing
 ```
 
 ## The seven (quick glance)
