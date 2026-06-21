@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Awakening Arcade — Game Dev &amp; Electrical Curriculum</title>
+  <meta name="description" content="A personal learning OS for retro game development and electrical theory-to-trade, built on Coursework · Career · Sidegigz.">
+  <!-- Pixel font (falls back gracefully to monospace if offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">AWAKENING ARCADE<small>Coursework · Career · Sidegigz — your three pillars</small></div>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="spacer"></div>
+    <button class="btn sm" id="btn-backup" title="Export all your data to a file">💾 Backup</button>
+    <button class="btn sm" id="btn-restore" title="Import data from a backup file">📂 Restore</button>
+  </header>
+
+  <main>
+    <aside class="side" id="sidebar"></aside>
+    <section class="content" id="content"></section>
+  </main>
+
+  <footer class="foot">
+    Awakening Arcade · 100% local &amp; private — your data never leaves this device · Back up regularly.
+    Wage/cost/licensing figures are ballpark guidance — verify with the official linked sources.
+  </footer>
+
+  <!-- Curriculum data (plain globals so it works from file:// with no server) -->
+  <script src="js/data/gamedev.js"></script>
+  <script src="js/data/electrical.js"></script>
+  <!-- App -->
+  <script src="js/app.js"></script>
+</body>
+</html>
