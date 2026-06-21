@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- mobile-first: lock zoom, respect the iPhone notch / home bar -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0712" />
+
+  <!-- iOS "Add to Home Screen" → runs full-screen like a native app -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Temple Hunters" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="icon" href="icon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <title>Temple Hunters — Prism Ascent</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <button id="mute" class="mute" aria-label="toggle sound">♪ ON</button>
+
+  <!-- ░░ TITLE ░░ -->
+  <section id="screen-title" class="screen active">
+    <div class="title-wrap">
+      <h1 class="logo">TEMPLE<br><span>HUNTERS</span></h1>
+      <p class="tag">PRISM ASCENT</p>
+      <div class="ray-bar"></div>
+      <p class="pitch">Seven creatures. Seven colors. Seven tones.<br>
+        Climb the seven stone layers of the pyramid and turn the spectrum back into white.</p>
+      <button id="start" class="big">▶ ENTER</button>
+      <p class="hint">Tip: on iPhone, tap <b>Share → Add to Home Screen</b> to play full-screen &amp; offline.</p>
+    </div>
+  </section>
+
+  <!-- ░░ SELECT ░░ -->
+  <section id="screen-select" class="screen">
+    <header class="bar"><h2>CHOOSE YOUR HUNTER</h2></header>
+    <div id="roster" class="roster"></div>
+    <p class="footnote">Each Hunter binds a color to a light frequency, a sound tone, a stone, a sacred shape, and a layer of the Great Pyramid. Tap one to read its codex.</p>
+  </section>
+
+  <!-- ░░ CODEX ░░ -->
+  <section id="screen-codex" class="screen">
+    <header class="bar">
+      <button id="codex-back" class="ghost">‹ back</button>
+      <h2 id="codex-title">HUNTER</h2>
+    </header>
+    <div id="codex-body" class="codex-body"></div>
+    <div class="codex-actions">
+      <button id="hear-tone" class="ghost">♪ Hear its tone</button>
+      <button id="choose" class="big">⛰ Begin the Ascent</button>
+    </div>
+  </section>
+
+  <!-- ░░ BATTLE ░░ -->
+  <section id="screen-battle" class="screen">
+    <div class="hud">
+      <div class="layer-tag" id="layer-tag">LAYER 1/7</div>
+    </div>
+    <div class="hpbars">
+      <div class="hpbox enemy">
+        <div class="hprow"><span id="e-name">—</span><span id="e-hp-text">0/0</span></div>
+        <div class="track"><div id="e-hp" class="fill"></div></div>
+      </div>
+    </div>
+    <div class="scene-wrap"><canvas id="scene"></canvas></div>
+    <div class="hpbars">
+      <div class="hpbox">
+        <div class="hprow"><span id="p-name">—</span><span id="p-hp-text">0/0</span></div>
+        <div class="track"><div id="p-hp" class="fill"></div></div>
+      </div>
+    </div>
+    <div id="log" class="log"></div>
+    <div id="actions" class="actions"></div>
+  </section>
+
+  <!-- ░░ END ░░ -->
+  <section id="screen-end" class="screen">
+    <div class="title-wrap">
+      <h1 id="end-title" class="logo small">—</h1>
+      <div class="ray-bar"></div>
+      <p id="end-msg" class="pitch"></p>
+      <p id="end-whisper" class="whisper"></p>
+      <button id="again" class="big">↺ Play again</button>
+    </div>
+  </section>
+
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    // register the service worker for offline play (ignored on file://)
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () =>
+        navigator.serviceWorker.register("sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>

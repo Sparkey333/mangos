@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="ray" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0"   stop-color="#e23b2e"/>
+      <stop offset="0.16" stop-color="#f08a25"/>
+      <stop offset="0.33" stop-color="#f2cf1b"/>
+      <stop offset="0.5" stop-color="#3fb24a"/>
+      <stop offset="0.66" stop-color="#2f6fe0"/>
+      <stop offset="0.83" stop-color="#4b32b0"/>
+      <stop offset="1"   stop-color="#9a3fd6"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#0a0712"/>
+  <!-- pyramid of seven stacked color layers -->
+  <g>
+    <polygon points="256,96 304,168 208,168" fill="#9a3fd6"/>
+    <polygon points="208,168 304,168 328,224 184,224" fill="#4b32b0"/>
+    <polygon points="184,224 328,224 352,280 160,280" fill="#2f6fe0"/>
+    <polygon points="160,280 352,280 376,336 136,336" fill="#3fb24a"/>
+    <polygon points="136,336 376,336 400,392 112,392" fill="#f2cf1b"/>
+    <polygon points="112,392 400,392 416,432 96,432" fill="#f08a25"/>
+    <polygon points="96,432 416,432 416,432 96,432" fill="#e23b2e"/>
+    <polygon points="96,432 416,432 432,448 80,448" fill="#e23b2e"/>
+  </g>
+  <!-- white capstone beam -->
+  <circle cx="256" cy="92" r="16" fill="#fff"/>
+  <rect x="240" y="20" width="32" height="60" rx="8" fill="url(#ray)" opacity="0.9"/>
+</svg>
