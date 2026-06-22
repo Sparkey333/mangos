@@ -1,0 +1,28 @@
+{
+  "name": "RetroLauncher Classic Purple",
+  "identifier": "com.retrolauncher.skin.gba-classic",
+  "gameTypeIdentifier": "com.rileytestut.delta.game.gba",
+  "debug": false,
+  "representations": {
+    "iphone": {
+      "edgeToEdge": {
+        "landscape": {
+          "assets": { "resizable": "shell-classic.pdf" },
+          "items": [
+            { "inputs": ["up", "down", "left", "right"], "frame": { "x": 30, "y": 150, "width": 140, "height": 140 }, "extendedEdges": { "top": 12, "bottom": 12, "left": 12, "right": 12 } },
+            { "inputs": ["a"], "frame": { "x": 690, "y": 160, "width": 60, "height": 60 }, "extendedEdges": { "top": 10, "bottom": 10, "left": 10, "right": 10 } },
+            { "inputs": ["b"], "frame": { "x": 620, "y": 210, "width": 60, "height": 60 }, "extendedEdges": { "top": 10, "bottom": 10, "left": 10, "right": 10 } },
+            { "inputs": ["l"], "frame": { "x": 20, "y": 20, "width": 90, "height": 36 } },
+            { "inputs": ["r"], "frame": { "x": 670, "y": 20, "width": 90, "height": 36 } },
+            { "inputs": ["start"], "frame": { "x": 430, "y": 360, "width": 60, "height": 26 } },
+            { "inputs": ["select"], "frame": { "x": 350, "y": 360, "width": 60, "height": 26 } }
+          ],
+          "screens": [
+            { "inputFrame": { "x": 0, "y": 0, "width": 240, "height": 160 }, "outputFrame": { "x": 260, "y": 40, "width": 240, "height": 160 } }
+          ],
+          "mappingSize": { "width": 768, "height": 400 }
+        }
+      }
+    }
+  }
+}

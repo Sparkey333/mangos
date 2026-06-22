@@ -1,0 +1,177 @@
+/* Netflix/Plex dark theme — GBA purple accent variant */
+
+.page {
+  width: 100%;
+  height: 100%;
+  background: var(--c-bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero banner (top featured game — big art like Netflix) */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 45vw;
+  min-height: 180px;
+  max-height: 340px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.hero__art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.hero__gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13,13,13,0) 30%,
+    rgba(13,13,13,0.7) 70%,
+    rgba(13,13,13,1) 100%
+  );
+}
+.hero__meta {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  right: 20px;
+}
+.hero__title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.hero__subtitle {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 4px;
+}
+.hero__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Primary play button */
+.btn-play {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: #fff;
+  color: #000;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.btn-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: rgba(109,109,110,0.7);
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Content rows */
+.row {
+  padding: 0 12px;
+  margin-bottom: 20px;
+}
+.row__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+
+/* ROM card (box art tile) */
+.rom-card {
+  width: 120px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.15s ease;
+}
+.rom-card:active { transform: scale(0.95); }
+.rom-card__art {
+  width: 120px;
+  height: 107px; /* GBA box ~16:14 ratio */
+  border-radius: 8px;
+  background: var(--c-surface2);
+  object-fit: cover;
+  border: 1px solid var(--c-border);
+}
+.rom-card__title {
+  font-size: 11px;
+  color: var(--c-muted);
+  margin-top: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.rom-card--active .rom-card__art {
+  border-color: var(--c-accent2);
+  box-shadow: 0 0 0 2px var(--c-accent2);
+}
+
+/* System badge (GBA / PSX) */
+.sys-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.sys-badge--gba  { background: var(--c-gba-purple); color: #fff; }
+.sys-badge--psx  { background: #1a4080; color: #fff; }
+.sys-badge--gbc  { background: #1a6040; color: #fff; }
+
+/* Settings / Admin toggle rows */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--c-border);
+}
+.toggle-row__label { font-size: 15px; }
+.toggle-row__desc { font-size: 12px; color: var(--c-muted); margin-top: 2px; }
+
+/* iOS-style toggle */
+.toggle {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 15.5px;
+  background: var(--c-border);
+  transition: background 0.2s;
+}
+.toggle input:checked + .toggle__track { background: #34c759; }
+.toggle__thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  transition: left 0.2s;
+}
+.toggle input:checked ~ .toggle__thumb { left: 22px; }
