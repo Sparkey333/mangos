@@ -1,0 +1,43 @@
+{
+  "title": "AetherForge Studio Hub",
+  "groups": [
+    {
+      "title": "Start",
+      "docs": [
+        { "id": "start", "title": "Start Here", "file": "00-start-here.md" }
+      ]
+    },
+    {
+      "title": "Design",
+      "docs": [
+        { "id": "gdd", "title": "Game Design Doc", "file": "01-game-design-doc.md" },
+        { "id": "legal", "title": "Legal Clean-Room", "file": "05-legal-cleanroom.md" }
+      ]
+    },
+    {
+      "title": "Build",
+      "docs": [
+        { "id": "engines", "title": "Engines & Tools", "file": "02-engines-and-tools.md" },
+        { "id": "assets", "title": "Asset Pipeline", "file": "03-asset-pipeline.md" }
+      ]
+    },
+    {
+      "title": "Automate",
+      "docs": [
+        { "id": "scale", "title": "1 Dev → 100 (AI)", "file": "06-scaling-with-ai.md" }
+      ]
+    },
+    {
+      "title": "Ship",
+      "docs": [
+        { "id": "setup", "title": "Mac Setup & Apps", "file": "04-mac-setup-and-apps.md" }
+      ]
+    },
+    {
+      "title": "Archive",
+      "docs": [
+        { "id": "feasibility", "title": "Original Feasibility", "file": "archive-original-feasibility.md" }
+      ]
+    }
+  ]
+}
