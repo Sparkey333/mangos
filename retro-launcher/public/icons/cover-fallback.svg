@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="214" viewBox="0 0 240 214">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5a189a"/>
+      <stop offset="1" stop-color="#2a1142"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="214" rx="10" fill="url(#g)"/>
+  <text x="120" y="100" font-family="-apple-system,sans-serif" font-size="20"
+        font-weight="700" fill="#b0a0d0" text-anchor="middle">RETRO</text>
+  <text x="120" y="128" font-family="-apple-system,sans-serif" font-size="12"
+        fill="#8a7ab0" text-anchor="middle" letter-spacing="2">NO ART</text>
+</svg>

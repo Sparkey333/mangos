@@ -1,0 +1,15 @@
+{
+  "appId": "com.retrolauncher.app",
+  "appName": "RetroLauncher",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#0d0d0d"
+  },
+  "plugins": {
+    "HapticBridge": {}
+  }
+}
