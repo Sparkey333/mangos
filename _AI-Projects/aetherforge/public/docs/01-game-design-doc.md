@@ -145,3 +145,21 @@ The slice that proves the game and earns Steam wishlists:
 - Engine: **Godot 4** (recommended for 2D solo) vs Unity vs a web/three.js build — see **Engines & Tools**.
 - Title & protagonist identity (keep it ownable, trademark-clean — see **Legal Clean-Room**).
 - Exact 3 abilities (dash is locked in; pick the other two).
+
+---
+
+## 16. ▶ The playable slice exists (start here)
+
+A Godot 4 vertical-slice project is now in the repo at **`_AI-Projects/aether-game/`**. It
+greyboxes M0–M1: a player with **coyote time, jump buffering, variable jump height, and a
+dash with i-frames**, a follow camera, a greybox room, and the **adaptive guitar/drums music
+manager** (ambient → combat → boss) wired to a proximity enemy and a boss zone.
+
+```bash
+# Install Godot 4.3+ (brew install --cask godot), then:
+#   Godot → Import → select _AI-Projects/aether-game/project.godot → Edit → press ▶
+```
+
+Controls: move `A`/`D`, jump `Space`, dash `Shift`. Walk up to the dummy or into the orange
+zone to *hear* the music layers cross-fade. Tunables are at the top of `scripts/player.gd`.
+Drop your guitar/drums OGG loops in `aether-game/audio/` (see its README) to bring it to life.

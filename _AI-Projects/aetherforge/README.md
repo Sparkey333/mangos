@@ -45,7 +45,7 @@ This was scaffolded in a cloud sandbox, so the macOS `.dmg`/`.app` is the one st
 on your Mac (Apple requirement). Everything is pre-wired for it.
 
 ## Tech
-Tauri 2 · Vite 5 · marked · (game engine TBD — **Godot 4 recommended**, see *Engines & Tools*)
+Tauri 2 · Vite 5 · marked · **Godot 4** game slice at `../aether-game` (see *Engines & Tools*)
 
 ## License
 Your code/content. Third-party assets must be tracked in a `CREDITS.md` — see *Legal Clean-Room*.
