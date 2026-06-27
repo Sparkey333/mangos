@@ -1,17 +1,21 @@
 extends Node2D
-## Project Aether — vertical-slice blockout.
-## Builds a greybox room in code, registers input, spawns the player + camera,
-## a training-dummy enemy, a boss zone, the adaptive music manager, and a HUD.
-## Everything is intentionally simple greyboxing — replace blockboxes with real
-## tilesets/art and the Polygon2D visuals with sprites as you build out the GDD.
+## Project Aether — vertical-slice arena.
+## Greybox room + the M2 goal: walk right past the gate to trigger the first
+## boss, a 3-phase escalating fight with a musical arc. Player has real combat
+## (attack/HP/respawn) and hit-stop on every connecting blow.
 
 const PlayerScript := preload("res://scripts/player.gd")
-const EnemyScript := preload("res://scripts/enemy.gd")
+const BossScript := preload("res://scripts/boss.gd")
 const MusicScript := preload("res://scripts/music_manager.gd")
+
+const SPAWN := Vector2(160, 520)
 
 var music
 var _player
+var _boss
+var _fight_started := false
 var _hud: Label
+var _banner: Label
 
 func _ready() -> void:
 	_setup_input()
@@ -21,16 +25,17 @@ func _ready() -> void:
 	add_child(music)
 
 	_player = PlayerScript.new()
-	_player.position = Vector2(160, 520)
+	_player.position = SPAWN
+	_player.respawn_point = SPAWN
 	_player.music = music
 	add_child(_player)
+	_player.died.connect(_on_player_died)
 	_add_camera(_player)
 
-	_spawn_enemy(Vector2(840, 560))
-	_add_boss_zone(Rect2(1090, 470, 150, 170))
+	_add_boss_gate(Rect2(600, 280, 36, 380))
 	_build_hud()
 
-# --- input (registered in code so the project needs no fragile input map) ---
+# --- input (registered in code; no fragile bindings to break) ---
 func _setup_input() -> void:
 	_ensure("move_left", [KEY_A, KEY_LEFT])
 	_ensure("move_right", [KEY_D, KEY_RIGHT])
@@ -53,13 +58,11 @@ func _build_level() -> void:
 		Rect2(0, 0, 32, 720),        # left wall
 		Rect2(1248, 0, 32, 720),     # right wall
 		Rect2(360, 540, 200, 26),    # low platform
-		Rect2(660, 430, 180, 26),    # mid platform (dash the gap to reach it)
-		Rect2(960, 330, 180, 26),    # high platform
+		Rect2(700, 470, 150, 26),    # mid platform (dash the gap)
+		Rect2(980, 380, 160, 26),    # high platform
 	]
 	for r in solids:
 		_add_solid(r, Color(0.13, 0.16, 0.25))
-	# an orange marker block = a future "dash gate" hint
-	_add_solid(Rect2(596, 560, 24, 100), Color(0.86, 0.49, 0.30))
 
 func _add_solid(rect: Rect2, color: Color) -> void:
 	var body := StaticBody2D.new()
@@ -86,14 +89,8 @@ func _add_camera(target: Node2D) -> void:
 	target.add_child(cam)
 	cam.make_current()
 
-func _spawn_enemy(pos: Vector2) -> void:
-	var e := EnemyScript.new()
-	e.position = pos
-	e.player = _player
-	e.music = music
-	add_child(e)
-
-func _add_boss_zone(rect: Rect2) -> void:
+# --- boss fight flow ---
+func _add_boss_gate(rect: Rect2) -> void:
 	var area := Area2D.new()
 	area.position = rect.position + rect.size * 0.5
 	var col := CollisionShape2D.new()
@@ -101,10 +98,37 @@ func _add_boss_zone(rect: Rect2) -> void:
 	shape.size = rect.size
 	col.shape = shape
 	area.add_child(col)
-	area.add_child(_rect_visual(rect.size, Color(0.70, 0.40, 0.20, 0.25)))
-	area.body_entered.connect(func(_b): if music: music.set_state("boss"))
-	area.body_exited.connect(func(_b): if music: music.set_state("explore"))
+	area.add_child(_rect_visual(rect.size, Color(0.70, 0.40, 0.20, 0.22)))
+	area.body_entered.connect(func(b):
+		if b.is_in_group("player"):
+			_start_fight()
+	)
 	add_child(area)
+
+func _start_fight() -> void:
+	if _fight_started:
+		return
+	_fight_started = true
+	_boss = BossScript.new()
+	_boss.position = Vector2(1060, 470)
+	_boss.music = music
+	_boss.player = _player
+	_boss.defeated.connect(_on_boss_defeated)
+	add_child(_boss)
+	_boss.activate()
+	_flash_banner("THE FIRST WARDEN")
+
+func _on_boss_defeated() -> void:
+	_boss = null
+	_flash_banner("THE WAY OPENS")
+
+func _on_player_died() -> void:
+	if is_instance_valid(_boss):
+		_boss.queue_free()
+	_boss = null
+	_fight_started = false
+	if music:
+		music.set_state("explore")
 
 # --- HUD ---
 func _build_hud() -> void:
@@ -116,9 +140,38 @@ func _build_hud() -> void:
 	_hud.add_theme_font_size_override("font_size", 18)
 	layer.add_child(_hud)
 
+	_banner = Label.new()
+	_banner.position = Vector2(0, 250)
+	_banner.size = Vector2(1280, 60)
+	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_banner.add_theme_color_override("font_color", Color(0.95, 0.85, 0.7))
+	_banner.add_theme_font_size_override("font_size", 40)
+	_banner.modulate = Color(1, 1, 1, 0)
+	layer.add_child(_banner)
+
+func _flash_banner(text: String) -> void:
+	_banner.text = text
+	_banner.modulate = Color(1, 1, 1, 1)
+	var t := create_tween()
+	t.tween_interval(1.4)
+	t.tween_property(_banner, "modulate", Color(1, 1, 1, 0), 1.0)
+
 func _process(_delta: float) -> void:
-	if _hud and is_instance_valid(_player):
-		_hud.text = "PROJECT AETHER — vertical slice\nMove A/D · Jump Space/W · Dash Shift/J · Attack K/X\nDash: %s   |   Music layer: %s   (walk to the dummy / orange zone to hear it shift)" % [
-			"unlocked" if _player.has_dash else "locked",
-			music.state if music else "-"
-		]
+	if not _hud or not is_instance_valid(_player):
+		return
+	var hearts := ""
+	for i in _player.MAX_HP:
+		hearts += "♥ " if i < _player.hp else "· "
+	var boss_line := ""
+	if is_instance_valid(_boss):
+		boss_line = "\nWARDEN  P%d  [%s]" % [_boss.phase, _boss_bar()]
+	_hud.text = "PROJECT AETHER — vertical slice\nMove A/D · Jump Space · Dash Shift · Attack K\nHP %s   Dash %s%s" % [
+		hearts,
+		"on" if _player.has_dash else "off",
+		boss_line
+	]
+
+func _boss_bar() -> String:
+	var frac: float = clampf(float(_boss.hp) / float(_boss.MAX_HP), 0.0, 1.0)
+	var filled := int(round(frac * 20.0))
+	return "#".repeat(filled) + "-".repeat(20 - filled)

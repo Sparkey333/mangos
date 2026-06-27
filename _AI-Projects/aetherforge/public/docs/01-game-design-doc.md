@@ -150,16 +150,19 @@ The slice that proves the game and earns Steam wishlists:
 
 ## 16. ▶ The playable slice exists (start here)
 
-A Godot 4 vertical-slice project is now in the repo at **`_AI-Projects/aether-game/`**. It
-greyboxes M0–M1: a player with **coyote time, jump buffering, variable jump height, and a
-dash with i-frames**, a follow camera, a greybox room, and the **adaptive guitar/drums music
-manager** (ambient → combat → boss) wired to a proximity enemy and a boss zone.
+A Godot 4 vertical-slice project is in the repo at **`_AI-Projects/aether-game/`**. It now covers
+**M0–M2**: a player with **coyote time, jump buffering, variable jump height, and a dash with
+i-frames**; **real combat** (melee attack, HP/hearts, knockback, instant respawn); **hit-stop** on
+every connecting blow; and a **3-phase boss — "The First Warden"** whose telegraphed attacks
+escalate each phase (charge → +3-bolt spread → desperation: rapid charge + 5-bolt spread),
+with the **music climbing a layer per phase** (bed → +combat → full + pitch-up).
 
 ```bash
 # Install Godot 4.3+ (brew install --cask godot), then:
 #   Godot → Import → select _AI-Projects/aether-game/project.godot → Edit → press ▶
 ```
 
-Controls: move `A`/`D`, jump `Space`, dash `Shift`. Walk up to the dummy or into the orange
-zone to *hear* the music layers cross-fade. Tunables are at the top of `scripts/player.gd`.
-Drop your guitar/drums OGG loops in `aether-game/audio/` (see its README) to bring it to life.
+Controls: move `A`/`D`, jump `Space`, dash `Shift`, **attack `K`**. Run right, dash the gap, cross
+the orange gate to wake the Warden. Tunables are at the top of `scripts/player.gd` and
+`scripts/boss.gd`. Drop guitar/drums OGG loops in `aether-game/audio/` (see its README) to hear the
+phase-by-phase musical escalation.
