@@ -5,6 +5,7 @@ import RomRow from '../components/RomLibrary/RomRow'
 import AdBanner from '../components/MediaPlayer/AdBanner'
 import { PROMOS } from '../components/MediaPlayer/promos'
 import { getRoms, getContinuePlaying } from '../services/localLibrary'
+import DemoMode from '../demo/DemoMode'
 import { getBoxArtUrl, getTitleScreenUrl } from '../services/metadata'
 import { HapticEngine } from '../components/HapticEngine/HapticEngine'
 
@@ -53,10 +54,7 @@ export default function Home() {
       )}
 
       {roms.length === 0 && (
-        <div style={{ padding: 40, textAlign: 'center', color: 'var(--c-muted)' }}>
-          <p style={{ marginBottom: 16 }}>No games yet.</p>
-          <button className="btn-play" onClick={() => nav('/settings')}>Connect Google Drive</button>
-        </div>
+        <DemoMode onSeeded={() => getRoms().then(setRoms)} />
       )}
 
       <RomRow label="Continue Playing" roms={continueRow} activeId={featured?.id} />

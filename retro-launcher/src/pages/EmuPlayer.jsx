@@ -31,9 +31,18 @@ export default function EmuPlayer() {
       // Resolve ROM bytes: local cache first, else download from Drive
       let romBlob = await getBlob(rom.id)
       if (!romBlob) {
-        if (!isAuthed()) { setStatus('Connect Google Drive in Settings first'); return }
-        setStatus('Downloading from Drive…')
-        romBlob = await downloadFile(rom.driveId || rom.id, p => !cancelled && setProgress(p))
+        if (rom.isDemo && rom.demoUrl) {
+          // Demo ROMs are free open-source homebrew — fetch directly from their
+          // official public release URL, no Drive auth needed.
+          setStatus('Fetching demo ROM…')
+          const res = await fetch(rom.demoUrl)
+          if (!res.ok) { setStatus(`Demo fetch failed: ${res.status}`); return }
+          romBlob = await res.blob()
+        } else {
+          if (!isAuthed()) { setStatus('Connect Google Drive in Settings first'); return }
+          setStatus('Downloading from Drive…')
+          romBlob = await downloadFile(rom.driveId || rom.id, p => !cancelled && setProgress(p))
+        }
         await saveBlob(rom.id, romBlob)
         await db.roms.update(rom.id, { downloaded: true })
       }

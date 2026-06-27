@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 400" width="780" height="400">
+  <defs>
+    <!-- Shell gradient: GBA Indigo/Purple -->
+    <linearGradient id="shell-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#6b3fa0"/>
+      <stop offset="45%"  stop-color="#5a2d8c"/>
+      <stop offset="100%" stop-color="#3a1a60"/>
+    </linearGradient>
+    <!-- Plastic sheen highlight -->
+    <linearGradient id="shell-shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="60%"  stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- Screen bezel -->
+    <linearGradient id="bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0d0d1a"/>
+    </linearGradient>
+    <!-- Screen active area -->
+    <linearGradient id="screen-glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#1a2a1a"/>
+      <stop offset="100%" stop-color="#0a1a0a"/>
+    </linearGradient>
+    <!-- Button depth shadows -->
+    <filter id="btn-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.6)"/>
+    </filter>
+    <filter id="inset" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="-1" stdDeviation="1" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+    <!-- Speaker hole pattern -->
+    <pattern id="speaker-dots" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.2" fill="rgba(0,0,0,0.45)"/>
+    </pattern>
+    <!-- Button gradients -->
+    <radialGradient id="btn-ab" cx="35%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </radialGradient>
+    <radialGradient id="btn-dpad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#2d2d3a"/>
+      <stop offset="100%" stop-color="#1a1a26"/>
+    </radialGradient>
+    <radialGradient id="btn-sys" cx="35%" cy="30%" r="70%">
+      <stop offset="0%"   stop-color="#4a4a5a"/>
+      <stop offset="100%" stop-color="#2a2a3a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ═══════════════════════════════ SHELL BODY ═══════════════════════════════ -->
+
+  <!-- Shoulder bumps (L and R) -->
+  <path d="M 50,50 Q 50,18 100,18 L 200,18 Q 220,18 220,40 L 220,55 Z"
+        fill="url(#shell-body)" filter="url(#btn-shadow)"/>
+  <path d="M 730,50 Q 730,18 680,18 L 580,18 Q 560,18 560,40 L 560,55 Z"
+        fill="url(#shell-body)" filter="url(#btn-shadow)"/>
+
+  <!-- Main body -->
+  <rect x="50" y="50" width="680" height="320" rx="28" ry="28"
+        fill="url(#shell-body)"/>
+
+  <!-- Plastic sheen overlay -->
+  <rect x="50" y="50" width="680" height="160" rx="28" ry="28"
+        fill="url(#shell-shine)" opacity="0.6"/>
+
+  <!-- Subtle side rim shadow to give depth -->
+  <rect x="50" y="50" width="680" height="320" rx="28" ry="28"
+        fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="2"/>
+  <rect x="52" y="52" width="676" height="316" rx="26" ry="26"
+        fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════ SCREEN SECTION ══════════════════════════ -->
+
+  <!-- Screen outer bezel -->
+  <rect x="265" y="65" width="250" height="200" rx="10" ry="10"
+        fill="url(#bezel)" filter="url(#inset)"/>
+
+  <!-- Screen inner frame (darker inset) -->
+  <rect x="273" y="73" width="234" height="184" rx="6" ry="6"
+        fill="#08080f"/>
+
+  <!-- Active screen area — 240:160 = 3:2 ratio -->
+  <rect x="281" y="81" width="218" height="145" rx="3" ry="3"
+        fill="url(#screen-glow)"/>
+
+  <!-- Screen glass reflection -->
+  <path d="M 281,81 L 499,81 L 499,98 Q 390,88 281,98 Z"
+        fill="rgba(255,255,255,0.06)"/>
+
+  <!-- Screen label below bezel -->
+  <text x="390" y="278" text-anchor="middle"
+        font-family="-apple-system, 'Helvetica Neue', sans-serif"
+        font-size="7" font-weight="700" letter-spacing="3"
+        fill="rgba(255,255,255,0.25)">RETROLAUNCHER</text>
+
+  <!-- ══════════════════════════ D-PAD (left side) ════════════════════════════ -->
+
+  <!-- D-pad cross shadow base -->
+  <g transform="translate(125,200)" filter="url(#btn-shadow)">
+    <!-- Vertical bar -->
+    <rect x="-14" y="-42" width="28" height="84" rx="5" ry="5" fill="url(#btn-dpad)"/>
+    <!-- Horizontal bar -->
+    <rect x="-42" y="-14" width="84" height="28" rx="5" ry="5" fill="url(#btn-dpad)"/>
+    <!-- Center cap -->
+    <rect x="-14" y="-14" width="28" height="28" rx="3" ry="3" fill="#252535"/>
+    <!-- Arrow labels -->
+    <text x="0" y="-24" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.4)">▲</text>
+    <text x="0" y="34"  text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.4)">▼</text>
+    <text x="-28" y="4" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.4)">◀</text>
+    <text x="28"  y="4" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.4)">▶</text>
+  </g>
+
+  <!-- ══════════════════════════ A/B BUTTONS (right side) ════════════════════ -->
+
+  <!-- B button (lower-left of face cluster) -->
+  <circle cx="620" cy="240" r="22" fill="url(#btn-ab)" filter="url(#btn-shadow)"/>
+  <circle cx="620" cy="240" r="22" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="620" y="245" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="14" font-weight="800" fill="white" opacity="0.9">B</text>
+
+  <!-- A button (upper-right of face cluster) -->
+  <circle cx="665" cy="200" r="22" fill="url(#btn-ab)" filter="url(#btn-shadow)"/>
+  <circle cx="665" cy="200" r="22" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="665" y="205" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="14" font-weight="800" fill="white" opacity="0.9">A</text>
+
+  <!-- Button labels (B/A micro text below buttons) -->
+  <text x="620" y="270" text-anchor="middle" font-size="7" font-weight="700"
+        letter-spacing="0.5" fill="rgba(255,255,255,0.3)">B</text>
+  <text x="665" y="230" text-anchor="middle" font-size="7" font-weight="700"
+        letter-spacing="0.5" fill="rgba(255,255,255,0.3)">A</text>
+
+  <!-- ══════════════════════════ SHOULDER BUTTONS ═════════════════════════════ -->
+
+  <!-- L shoulder -->
+  <rect x="58" y="22" width="90" height="28" rx="6" ry="6"
+        fill="#3a2a6a" filter="url(#btn-shadow)"/>
+  <rect x="58" y="22" width="90" height="28" rx="6" ry="6"
+        fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="103" y="40" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="11" font-weight="700" fill="rgba(255,255,255,0.7)">L</text>
+
+  <!-- R shoulder -->
+  <rect x="632" y="22" width="90" height="28" rx="6" ry="6"
+        fill="#3a2a6a" filter="url(#btn-shadow)"/>
+  <rect x="632" y="22" width="90" height="28" rx="6" ry="6"
+        fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="677" y="40" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="11" font-weight="700" fill="rgba(255,255,255,0.7)">R</text>
+
+  <!-- ══════════════════════════ START / SELECT ════════════════════════════════ -->
+
+  <!-- SELECT (rotated pill, left of center) -->
+  <g transform="translate(320,320) rotate(-20)">
+    <rect x="-28" y="-9" width="56" height="18" rx="9" ry="9"
+          fill="url(#btn-sys)" filter="url(#btn-shadow)"/>
+    <text x="0" y="4" text-anchor="middle" font-family="-apple-system,sans-serif"
+          font-size="6" font-weight="700" letter-spacing="0.5"
+          fill="rgba(255,255,255,0.6)">SELECT</text>
+  </g>
+
+  <!-- START (rotated pill, right of center) -->
+  <g transform="translate(420,320) rotate(-20)">
+    <rect x="-28" y="-9" width="56" height="18" rx="9" ry="9"
+          fill="url(#btn-sys)" filter="url(#btn-shadow)"/>
+    <text x="0" y="4" text-anchor="middle" font-family="-apple-system,sans-serif"
+          font-size="6" font-weight="700" letter-spacing="0.5"
+          fill="rgba(255,255,255,0.6)">START</text>
+  </g>
+
+  <!-- ══════════════════════════ SPEAKER GRILLE ═══════════════════════════════ -->
+
+  <!-- Speaker grille on the right side below A/B -->
+  <rect x="590" y="270" width="90" height="60" rx="6" ry="6"
+        fill="rgba(0,0,0,0.2)"/>
+  <rect x="590" y="270" width="90" height="60" rx="6" ry="6"
+        fill="url(#speaker-dots)"/>
+
+  <!-- ══════════════════════════ POWER LED ════════════════════════════════════ -->
+
+  <circle cx="82" cy="340" r="4" fill="#00ff88" opacity="0.85"/>
+  <circle cx="82" cy="340" r="6" fill="rgba(0,255,136,0.15)"/>
+  <text x="92" y="343" font-family="-apple-system,sans-serif"
+        font-size="7" fill="rgba(255,255,255,0.3)">POWER</text>
+
+  <!-- ══════════════════════════ CARTRIDGE SLOT HINT ══════════════════════════ -->
+
+  <rect x="310" y="355" width="160" height="12" rx="3" ry="3"
+        fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="390" y="364" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="6" letter-spacing="1" fill="rgba(255,255,255,0.15)">GAME PAK</text>
+
+  <!-- Bottom branding -->
+  <text x="390" y="385" text-anchor="middle" font-family="-apple-system,sans-serif"
+        font-size="7" letter-spacing="2" fill="rgba(255,255,255,0.12)">RETROLAUNCHER · GBA CLASSIC</text>
+</svg>

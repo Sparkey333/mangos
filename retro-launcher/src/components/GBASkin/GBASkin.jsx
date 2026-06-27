@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { HapticEngine } from '../HapticEngine/HapticEngine'
 import './GBASkin.css'
 

@@ -19,6 +19,14 @@ export async function bootEmulatorJS({ container, system, romBlob, romName, bios
   if (!core) throw new Error(`No core mapped for system ${system}`)
 
   const romUrl = URL.createObjectURL(romBlob)
+  const biosUrl = (system === 'PSX' && biosBlob) ? URL.createObjectURL(biosBlob) : null
+
+  // Revoke object URLs once the emulator has loaded its data — they persist in
+  // memory otherwise and accumulate across game launches.
+  const revokeUrls = () => {
+    URL.revokeObjectURL(romUrl)
+    if (biosUrl) URL.revokeObjectURL(biosUrl)
+  }
 
   // EmulatorJS reads these globals before its loader script runs
   window.EJS_player = '#ejs-screen'
@@ -28,9 +36,7 @@ export async function bootEmulatorJS({ container, system, romBlob, romName, bios
   window.EJS_startOnLoaded = true
   window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/'
 
-  if (system === 'PSX' && biosBlob) {
-    window.EJS_biosUrl = URL.createObjectURL(biosBlob)
-  }
+  if (biosUrl) window.EJS_biosUrl = biosUrl
 
   // Hide EmulatorJS's own on-screen controls — we render our own GBA skin
   window.EJS_Buttons = {
@@ -39,9 +45,11 @@ export async function bootEmulatorJS({ container, system, romBlob, romName, bios
     gamepad: false, cheat: false,
   }
 
-  // Persist saves back through our callback (-> Drive sync)
   window.EJS_onSaveState = (e) => onSave?.('state', e.state)
-  window.EJS_onGameStart = () => console.info('[emu] game started:', romName)
+  window.EJS_onGameStart = () => {
+    console.info('[emu] game started:', romName)
+    revokeUrls()
+  }
 
   container.innerHTML = '<div id="ejs-screen" style="width:100%;height:100%"></div>'
 

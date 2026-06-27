@@ -34,9 +34,11 @@ class HapticEngineClass {
   startEdgeSlip(buttonId) {
     if (!this.enabled || !this.edgeSlipEnabled) return
     if (this._activeEdgeSlip === buttonId) return
+    // Always clear any existing interval before starting a new one; otherwise
+    // switching quickly between two buttons leaks the first interval forever.
+    clearInterval(this._edgeInterval)
     this._activeEdgeSlip = buttonId
     this.fire('edgeSlip')
-    // Re-fire every 80ms to simulate continuous slip feel
     this._edgeInterval = setInterval(() => this.fire('edgeSlip'), 80)
   }
 

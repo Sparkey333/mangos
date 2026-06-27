@@ -1,6 +1,6 @@
 // ROM + BIOS integrity validation — runs client-side before any file is loaded into emulator
 
-import md5 from 'md5'
+import SparkMD5 from 'spark-md5'
 
 // Known-good PSX BIOS MD5 hashes (from hardware dumps)
 const PSX_BIOS_HASHES = {
@@ -18,10 +18,15 @@ const PSX_COMPAT = {
   'Small Soldiers':  { bios: 'SCPH5501.BIN', notes: 'Single disc, runs well' },
 }
 
+function bufferMD5(arrayBuffer) {
+  // SparkMD5.ArrayBuffer.hash handles raw binary correctly in the browser;
+  // the generic md5() package would stringify a Uint8Array as "[object Uint8Array]".
+  return SparkMD5.ArrayBuffer.hash(arrayBuffer)
+}
+
 export async function validateBIOS(file) {
   const buffer = await file.arrayBuffer()
-  const bytes = new Uint8Array(buffer)
-  const hash = md5(bytes)
+  const hash = bufferMD5(buffer)
   const name = file.name.toUpperCase()
 
   const expectedHash = PSX_BIOS_HASHES[name]
@@ -40,21 +45,23 @@ export function getBIOSCompat(gameName) {
 
 export async function hashROM(file) {
   const buffer = await file.arrayBuffer()
-  return md5(new Uint8Array(buffer))
+  return bufferMD5(buffer)
 }
 
-// Check if a file is likely a valid GBA ROM by magic bytes
+// Check if a file is likely a valid GBA ROM by inspecting the Nintendo logo bytes.
+// The Nintendo logo at header offset 0x04 (first 4 bytes: 0x24FFAE51 little-endian)
+// is present in every licensed GBA cartridge and is the most reliable identifier.
+// The entry-point field at 0x00 varies legitimately across titles, so we skip it.
 export async function validateGBAROM(file) {
-  const buffer = await file.arrayBuffer()
+  if (file.size < 192) {
+    return { valid: false, reason: 'File too small to be a valid GBA ROM' }
+  }
+  const buffer = await file.slice(0, 8).arrayBuffer()
   const view = new DataView(buffer)
-  // GBA ROM entry point: 0xEA000000 (B instruction) at offset 0x00
-  const entry = view.getUint32(0, true)
-  if (entry !== 0xEA000000 && entry !== 0x00000000) {
-    // Nintendo logo check at 0x04 — partial match is enough
-    const logoStart = view.getUint32(4, true)
-    if (logoStart !== 0x24FFAE51) {
-      return { valid: false, reason: 'File does not appear to be a valid GBA ROM' }
-    }
+  // Nintendo logo first 4 bytes at offset 0x04, little-endian
+  const logoStart = view.getUint32(4, true)
+  if (logoStart !== 0x24FFAE51) {
+    return { valid: false, reason: 'File does not appear to be a valid GBA ROM (Nintendo logo header missing)' }
   }
   return { valid: true, size: file.size }
 }

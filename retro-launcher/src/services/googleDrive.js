@@ -51,8 +51,10 @@ async function driveFetch(path, params = {}) {
 
 // Find the user's "RetroLauncher" folder (or any folder by name)
 export async function findFolder(name = 'RetroLauncher') {
+  // Escape single quotes in the name so they don't break the Drive query syntax.
+  const safe = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
   const data = await driveFetch('/files', {
-    q: `mimeType='application/vnd.google-apps.folder' and name='${name}' and trashed=false`,
+    q: `mimeType='application/vnd.google-apps.folder' and name='${safe}' and trashed=false`,
     fields: 'files(id,name)',
   })
   return data.files[0] || null
