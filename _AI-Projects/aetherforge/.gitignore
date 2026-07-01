@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# web build output
+dist/
+
+# tauri / rust build output
+src-tauri/target/
+src-tauri/gen/
+
+# generated icons (regenerate with `npm run icons`)
+src-tauri/icons/*.png
+src-tauri/icons/*.icns
+src-tauri/icons/*.ico
+
+# os / editor
+.DS_Store
+*.local
+.vscode/
+.idea/

@@ -1,0 +1,25 @@
+{
+  "name": "aetherforge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AetherForge — an indie game studio command hub (design docs, engine + asset references, AI automation playbook). Desktop (Tauri/dmg) + web + mobile browser from one codebase.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "tauri": "tauri",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "icons": "tauri icon ./app-icon.png",
+    "ios:dev": "tauri ios dev",
+    "android:dev": "tauri android dev"
+  },
+  "dependencies": {
+    "marked": "^12.0.2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "vite": "^5.4.10"
+  }
+}

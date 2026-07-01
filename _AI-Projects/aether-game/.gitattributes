@@ -1,0 +1,7 @@
+# Normalize line endings for Godot text resources
+*.gd text eol=lf
+*.tscn text eol=lf
+*.godot text eol=lf
+# Audio stems are binary
+*.ogg binary
+*.wav binary
