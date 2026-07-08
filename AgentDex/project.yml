@@ -1,0 +1,107 @@
+# XcodeGen spec for the FULL app: iPhone app + macOS app + WidgetKit widgets.
+# This is the path to run on device / archive for TestFlight & the App Store.
+#
+# Prereqs (on a Mac):
+#   brew install xcodegen
+#   cd AgentDex && xcodegen generate && open AgentDex.xcodeproj
+#
+# The macOS .dmg for quick local testing does NOT need this — see BUILD.md.
+name: AgentDex
+options:
+  bundleIdPrefix: com.agentdex
+  deploymentTarget:
+    iOS: "16.0"
+    macOS: "13.0"
+  createIntermediateGroups: true
+
+packages:
+  AgentDex:
+    path: .
+
+settings:
+  base:
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: YES
+    # Set this to your Apple Developer Team ID to sign for device/TestFlight.
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+
+  # ---- iPhone app -------------------------------------------------------
+  AgentDex-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/AgentDexApp
+    dependencies:
+      - package: AgentDex
+        product: AgentDexCore
+      - package: AgentDex
+        product: AgentDexImport
+      - target: AgentDexWidgets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentdex.app
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+    entitlements:
+      path: Config/AgentDex.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.agentdex
+
+  # ---- WidgetKit extension (iOS) ---------------------------------------
+  AgentDexWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+      - path: Sources/AgentDexApp/SharedStore.swift
+      - path: Sources/AgentDexApp/Color+Hex.swift
+      - path: Sources/AgentDexApp/Views/DaemonSprite.swift
+    dependencies:
+      - package: AgentDex
+        product: AgentDexCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentdex.app.widgets
+        INFOPLIST_KEY_CFBundleDisplayName: AgentDex
+        INFOPLIST_KEY_NSExtension_Generation: NO
+    info:
+      path: Config/Widgets-Info.plist
+      properties:
+        CFBundleDisplayName: AgentDex
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: Config/AgentDexWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.agentdex
+
+  # ---- macOS app (optional; the .dmg script covers this too) -----------
+  AgentDex-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/AgentDexApp
+    dependencies:
+      - package: AgentDex
+        product: AgentDexCore
+      - package: AgentDex
+        product: AgentDexImport
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.agentdex.app
+        LSApplicationCategoryType: public.app-category.games
+    entitlements:
+      path: Config/AgentDex-macOS.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.application-groups:
+          - group.agentdex

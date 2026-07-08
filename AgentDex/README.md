@@ -25,13 +25,19 @@ behind every project.
 |------|------------|
 | `DESIGN.md` | The full game design document (mechanics, world, story, humor) |
 | `ARCHITECTURE.md` | Technical architecture: how core / app / widget fit together |
+| `BUILD.md` | **How to run it on your Mac** (test app, `.dmg`, Xcode project) |
+| `DISTRIBUTION.md` | Local test → TestFlight → App Store, and what each step needs |
 | `ROADMAP.md` | Milestones from "tiny test build" → full game |
-| `Package.swift` | Swift Package for **AgentDexCore** (pure, testable logic) |
+| `Package.swift` | Swift Package: core, importer, the macOS app, and the CLI |
 | `Sources/AgentDexCore/` | The portable game engine (no UIKit/SpriteKit) |
-| `Tests/AgentDexCoreTests/` | Unit tests for generation, battle, and catching |
+| `Sources/AgentDexApp/` | SwiftUI + SpriteKit app (runs on macOS via SwiftPM; iOS via Xcode) |
+| `Sources/AgentDexImport/` | Log/folder → `agents.json` importer library |
+| `Sources/agentdex-import/` | The importer CLI (`swift run agentdex-import`) |
+| `Tests/` | Unit tests for generation, battle, catching, and importing |
+| `Scripts/` | `run.sh`, `build_macos_app.sh`, `make_dmg.sh`, `import_my_agents.sh` |
 | `Config/` | Example `agents.json` / `player.json` you edit to seed the game |
-| `App/` | SwiftUI + SpriteKit app sources (iOS-first, macOS-ready) |
-| `Widgets/` | WidgetKit sources (iOS + macOS home/lock-screen widgets) |
+| `Widgets/` | WidgetKit sources (added via the Xcode project) |
+| `project.yml` | XcodeGen spec → full iPhone + macOS + widgets Xcode project |
 
 ## The 60-second pitch of how it works
 
@@ -43,19 +49,29 @@ behind every project.
    catch them. Caught Daemons join your party and your **Dex**.
 4. Widgets show your starter / party / "Daemon of the Day" on the home screen.
 
-## Running the prototype (on a Mac)
+## Running it (on a Mac)
 
-The shared logic is a Swift Package you can build and test today:
+Full instructions in **BUILD.md**. The short version:
 
 ```bash
 cd AgentDex
-swift test        # runs the AgentDexCore unit tests
+swift test                    # 1. verify the game rules (generation/battle/catch/import)
+./Scripts/run.sh              # 2. play it: opens the macOS app (swift run AgentDexApp)
+./Scripts/make_dmg.sh         # 3. build build/AgentDex.dmg — install like a store app
 ```
 
-The app + widgets are plain Swift source files meant to be dropped into an Xcode
-project (see `ARCHITECTURE.md` → "Assembling the Xcode project"). They import
-`AgentDexCore`, so all the game rules are shared and tested.
+Seed it with **your** agents (optional but the whole point):
+```bash
+./Scripts/import_my_agents.sh mangos
+# or precisely:
+swift run agentdex-import --agents ~/.claude/agents --logs ~/.claude/projects --project mangos
+```
 
-> This prototype was scaffolded in a Linux CI container with no Swift toolchain,
-> so the core is written to compile cleanly but has not been run here — run
-> `swift test` locally first.
+For the **iPhone app + widgets** (and the App Store path):
+```bash
+brew install xcodegen && xcodegen generate && open AgentDex.xcodeproj
+```
+
+> Scaffolded in a Linux container with no Swift toolchain, so the code is written
+> to compile cleanly but has **not been run here**. Run `swift test` on your Mac
+> first; if anything trips, it'll be a quick fix.

@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import AgentDexCore
+import AgentDexImport
 
 /// The app-side game brain. Owns the SaveState + Bestiary, drives encounters, and
 /// delegates ALL rules to `AgentDexCore` so behavior matches the unit tests.
@@ -17,8 +18,17 @@ public final class GameState: ObservableObject {
     /// Whether the player prefers the classic screen-switch battle presentation.
     @Published public var useClassicBattle = false
 
+    /// True when the roster came from the user's own imported agents.json.
+    @Published public private(set) var usingImportedRoster = false
+
     public init() {
-        let (agents, player) = ConfigLoader.loadBundledExamples()
+        // Prefer the user's imported roster (written by `agentdex-import` into the
+        // shared AgentDex config dir); fall back to the bundled example roster.
+        let (bundledAgents, bundledPlayer) = ConfigLoader.loadBundledExamples()
+        let importedAgents = AgentConfigStore.readAgents()
+        let agents = (importedAgents?.isEmpty == false) ? importedAgents! : bundledAgents
+        let player = AgentConfigStore.readPlayer() ?? bundledPlayer
+        self.usingImportedRoster = (importedAgents?.isEmpty == false)
         let bestiary = Bestiary(profiles: agents)
         self.bestiary = bestiary
 

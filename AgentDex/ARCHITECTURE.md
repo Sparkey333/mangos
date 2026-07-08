@@ -53,29 +53,24 @@ is a presentation problem, not a logic rewrite.
    app container; the prototype uses a simple `Codable` round-trip).
 6. Widgets read the same `SaveState` JSON from a shared App Group container.
 
-## Assembling the Xcode project (when you're on a Mac)
+## Building & running
 
-The `App/` and `Widgets/` folders are source-only (no `.xcodeproj` is checked in,
-to keep the repo clean and merge-friendly). To run on device/simulator:
+Full, current instructions live in **BUILD.md**. Two paths:
 
-1. **New Xcode project** → *iOS App* → name `AgentDex`, interface **SwiftUI**.
-2. **Add the core package:** File → Add Package Dependencies → "Add Local…" →
-   select this `AgentDex/` folder (it has `Package.swift`). Add the
-   `AgentDexCore` library to your app target.
-3. **Add sources:** drag everything in `App/` into the app target, and the files
-   in `Config/` into the bundle (Target Membership ✓) so they ship as resources.
-4. **Add a Widget Extension** target → drag `Widgets/` sources into it; add the
-   `AgentDexCore` dependency to that target too. **Shared UI files:** add
-   `App/SharedStore.swift`, `App/Color+Hex.swift`, and
-   `App/Views/DaemonSprite.swift` to **both** the app target *and* the widget
-   target (check both boxes in File Inspector → Target Membership) — the widget
-   renders the same procedural sprites and reads the same save file.
-5. **App Group:** enable the *App Groups* capability on both targets with the same
-   group id (default expected: `group.agentdex`) so the widget can read the save.
-6. Build & run. For **macOS later**: add a Mac (Designed for iPad or native)
-   destination; the core needs no changes.
+- **macOS app + `.dmg`** — pure SwiftPM, no Xcode project needed:
+  `./Scripts/run.sh` (play) or `./Scripts/make_dmg.sh` (installable DMG). The app
+  is the `AgentDexApp` executable target in `Package.swift`; the `Info.plist` and
+  bundle are assembled by `Scripts/build_macos_app.sh`.
+- **iPhone + widgets (App Store path)** — generated from `project.yml`:
+  `brew install xcodegen && xcodegen generate && open AgentDex.xcodeproj`. This
+  creates `AgentDex-iOS`, `AgentDexWidgets` (extension), and `AgentDex-macOS`
+  targets, each depending on the `AgentDexCore` / `AgentDexImport` package
+  products. The widget target pulls in the three shared UI files
+  (`SharedStore.swift`, `Color+Hex.swift`, `Views/DaemonSprite.swift`) so it
+  renders the same procedural sprites and reads the same save. The App Group
+  (`group.agentdex`) is set on both app and widget in the spec.
 
-### Build/test the core alone (works on any Swift toolchain, no Xcode UI)
+### Build/test the core alone (any Swift toolchain, no Xcode UI)
 ```bash
 cd AgentDex
 swift build

@@ -13,9 +13,11 @@ the prior; nothing here requires throwing earlier work away.
 
 ## M1 — Make the loop feel good
 - [ ] Real-time-with-cooldown move queue + telegraphs in the overworld.
-- [ ] Throw mini-game polish: resonance ring, arc trajectory, shake-and-break beat.
-- [ ] Opt-in classic screen-switch battle scene (same engine).
-- [ ] Save/load via App Group; widget reads live party.
+- [ ] Throw mini-game polish: arc trajectory, shake-and-break beat (ring done).
+- [x] Opt-in classic screen-switch battle scene (same engine) — `ClassicBattleView`.
+- [x] Save/load via shared store; widget reads live party.
+- [x] Runnable macOS build + one-command `.dmg` packaging (`Scripts/`).
+- [x] XcodeGen project for iPhone + macOS + widgets (`project.yml`).
 
 ## M2 — Content & generation depth
 - [ ] Secondary aspects, abilities, expanded move pools per aspect/tier.
@@ -29,8 +31,10 @@ the prior; nothing here requires throwing earlier work away.
 - [ ] Comedian-voice dialogue pass; daemon barks during combat.
 
 ## M4 — Ingest automation (your "logs/indirect" idea)
-- [ ] Optional importer: scan log files / project dirs → auto-author `agents.json`.
-- [ ] "Seen in logs" = ghost encounters until met live.
+- [x] Optional importer: scan log files / project dirs → auto-author `agents.json`
+      (`AgentDexImport` + `agentdex-import` CLI). App auto-loads the result.
+- [ ] "Seen in logs" = ghost encounters until met live (data flagged; UI pending).
+- [ ] Richer log parsers (structured JSONL sessions, per-project tallies).
 
 ## M5 — Desktop + ecosystem
 - [ ] macOS build (input remap; window/scene sizing).

@@ -8,21 +8,41 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        .library(name: "AgentDexCore", targets: ["AgentDexCore"])
+        .library(name: "AgentDexCore", targets: ["AgentDexCore"]),
+        .library(name: "AgentDexImport", targets: ["AgentDexImport"]),
+        // A macOS-runnable build of the game via `swift run AgentDexApp`.
+        .executable(name: "AgentDexApp", targets: ["AgentDexApp"]),
+        // The agent-roster importer CLI: `swift run agentdex-import ...`.
+        .executable(name: "agentdex-import", targets: ["agentdex-import"])
     ],
     targets: [
         .target(
             name: "AgentDexCore",
             resources: [
-                // Example seed data ships with the core so the prototype runs
-                // even before you wire up the app bundle.
                 .copy("Resources/agents.example.json"),
                 .copy("Resources/player.example.json")
             ]
         ),
+        .target(
+            name: "AgentDexImport",
+            dependencies: ["AgentDexCore"]
+        ),
+        .executableTarget(
+            name: "agentdex-import",
+            dependencies: ["AgentDexImport", "AgentDexCore"]
+        ),
+        // SwiftUI + SpriteKit app. Builds for iOS/macOS (Apple platforms only).
+        .executableTarget(
+            name: "AgentDexApp",
+            dependencies: ["AgentDexCore", "AgentDexImport"]
+        ),
         .testTarget(
             name: "AgentDexCoreTests",
             dependencies: ["AgentDexCore"]
+        ),
+        .testTarget(
+            name: "AgentDexImportTests",
+            dependencies: ["AgentDexImport", "AgentDexCore"]
         )
     ]
 )

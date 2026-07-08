@@ -1,5 +1,8 @@
 import SpriteKit
 import AgentDexCore
+#if os(macOS)
+import AppKit
+#endif
 
 /// The animated overworld where daemons roam and fights happen IN the world
 /// (no screen switch — DESIGN §5.1). This prototype scene renders a player node
@@ -60,7 +63,7 @@ public final class OverworldScene: SKScene {
         }]))
     }
 
-    // MARK: - Input (touch on iOS; overridden for mouse on macOS later)
+    // MARK: - Input (touch on iOS; mouse on macOS)
 
     #if os(iOS)
     public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -70,6 +73,15 @@ public final class OverworldScene: SKScene {
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let t = touches.first else { return }
         movePlayer(to: t.location(in: self))
+    }
+    #endif
+
+    #if os(macOS)
+    public override func mouseDown(with event: NSEvent) {
+        movePlayer(to: event.location(in: self))
+    }
+    public override func mouseDragged(with event: NSEvent) {
+        movePlayer(to: event.location(in: self))
     }
     #endif
 

@@ -6,6 +6,7 @@ public enum ConfigLoader {
 
     public struct AgentsFile: Codable, Sendable {
         public var agents: [AgentProfile]
+        public init(agents: [AgentProfile]) { self.agents = agents }
     }
 
     public enum ConfigError: Error, CustomStringConvertible {

@@ -26,9 +26,10 @@ public struct OverworldView: View {
             VStack {
                 topBar
                 Spacer()
-                if let wild = game.wild {
+                // In-world battle panel (overworld / no-screen-switch mode only).
+                if let wild = game.wild, !game.useClassicBattle {
                     battlePanel(wild: wild)
-                } else {
+                } else if game.wild == nil {
                     Text("Walk into a roaming daemon to start a fight.")
                         .font(.caption).padding(8)
                         .background(.ultraThinMaterial, in: Capsule())
@@ -37,7 +38,7 @@ public struct OverworldView: View {
             }
             .padding()
 
-            if showCatch, let wild = game.wild {
+            if showCatch, let wild = game.wild, !game.useClassicBattle {
                 CatchOverlayView(
                     wild: wild,
                     spheres: availableSpheres(),
@@ -49,6 +50,20 @@ public struct OverworldView: View {
                 )
             }
         }
+        // Classic screen-switch battle: presented over the world when enabled.
+        .sheet(isPresented: classicBattlePresented) {
+            if let wild = game.wild {
+                ClassicBattleView(wild: wild)
+                    .environmentObject(game)
+            }
+        }
+    }
+
+    private var classicBattlePresented: Binding<Bool> {
+        Binding(
+            get: { game.useClassicBattle && game.wild != nil },
+            set: { presented in if !presented { game.wild = nil } }
+        )
     }
 
     private var topBar: some View {
