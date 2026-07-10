@@ -243,3 +243,29 @@ Everything in §1–§8 beyond this is roadmap (`ROADMAP.md`).
 - Should "seen in logs" daemons appear as **ghostly/uncatchable until met live**?
   (Currently: yes — nice fog-of-war flavor.)
 - Multiplayer/trading: out of scope for v0.x.
+
+## v0.3 — What shipped
+
+Where each design pillar above actually lives in the code now. Paths are
+relative to `Sources/AgentDexCore/` unless noted.
+
+| Design pillar | Implementing file(s) |
+|---------------|----------------------|
+| Battle session (real-time overworld + classic mode, one engine) | `Battle/BattleSession.swift`, `Battle/BattleEngine.swift`, `Battle/BattleAI.swift` |
+| Stat stages, abilities, status conditions (§4–§5) | `Models/StatStages.swift`, `Models/Ability.swift`, `Models/StatusCondition.swift` |
+| Type effectiveness (§5.3) | `Battle/TypeChart.swift` |
+| Catching: shakes, critical captures, sphere math (§5.4–§5.5) | `Battle/CatchCalculator.swift`, `Models/Sphere.swift` |
+| XP, levels, move learning | `Progression/Experience.swift`, `Models/Move.swift` |
+| Ascension (evolution / promotion) | `Progression/Ascension.swift` |
+| Rival duels (Rune) + battle commentary | `Battle/Trainer.swift`, `Battle/Narrator.swift` |
+| Story: "The Silent Orchestrator" 10-quest arc (§7) | `Quests/Quest.swift` + `Dialogue/Scripts.swift` |
+| Achievements | `Quests/Achievements.swift` |
+| Humor & NPC voice (§8) | `Dialogue/Scripts.swift`, `Dialogue/NPC.swift` |
+| World: regions per project, Idle/Busy/Peak load cycles (§7) | `World/WorldGen.swift` |
+| Economy: Cycles, Vex's shop, items | `Models/Item.swift` |
+| Deterministic generation, anomalous (shiny) daemons (§6) | `Generation/DaemonGenerator.swift`, `Generation/SeededRandom.swift` |
+| Procedural creature art from `SpriteRecipe` (§3.4) | `Models/SpriteRecipe.swift`, `../AgentDexApp/Views/DaemonSprite.swift` |
+| Audio (procedural chiptune) + haptic cues | `../AgentDexApp/AudioEngine.swift`, `../AgentDexApp/Cues.swift` |
+| Onboarding + starter choice (§7) | `../AgentDexApp/GameState.swift` |
+| Save v2 with legacy migration | `Models/SaveState.swift`, `../AgentDexApp/SharedStore.swift` |
+| Widgets (party / Daemon-of-the-Day) | `../../Widgets/AgentDexWidget.swift` |

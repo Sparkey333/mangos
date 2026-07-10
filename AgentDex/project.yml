@@ -36,6 +36,8 @@ targets:
     platform: iOS
     sources:
       - path: Sources/AgentDexApp
+      - path: Assets.xcassets
+        optional: true
     dependencies:
       - package: AgentDex
         product: AgentDexCore
@@ -48,6 +50,15 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    preBuildScripts:
+      - name: Generate App Icon
+        script: |
+          swift "$PROJECT_DIR/Scripts/generate_appicon.swift" "$PROJECT_DIR/GeneratedAssets" \
+            && mkdir -p "$PROJECT_DIR/Assets.xcassets" \
+            && cp -R "$PROJECT_DIR/GeneratedAssets/AppIcon.appiconset" "$PROJECT_DIR/Assets.xcassets/" \
+            || echo "icon gen skipped"
+        basedOnDependencyAnalysis: false
     entitlements:
       path: Config/AgentDex.entitlements
       properties:
@@ -89,6 +100,8 @@ targets:
     platform: macOS
     sources:
       - path: Sources/AgentDexApp
+      - path: Assets.xcassets
+        optional: true
     dependencies:
       - package: AgentDex
         product: AgentDexCore
@@ -98,6 +111,15 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.agentdex.app
         LSApplicationCategoryType: public.app-category.games
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    preBuildScripts:
+      - name: Generate App Icon
+        script: |
+          swift "$PROJECT_DIR/Scripts/generate_appicon.swift" "$PROJECT_DIR/GeneratedAssets" \
+            && mkdir -p "$PROJECT_DIR/Assets.xcassets" \
+            && cp -R "$PROJECT_DIR/GeneratedAssets/AppIcon.appiconset" "$PROJECT_DIR/Assets.xcassets/" \
+            || echo "icon gen skipped"
+        basedOnDependencyAnalysis: false
     entitlements:
       path: Config/AgentDex-macOS.entitlements
       properties:

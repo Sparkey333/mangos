@@ -42,6 +42,17 @@ for b in "${BIN_PATH}"/*.bundle; do
 done
 shopt -u nullglob
 
+# 2.5) App icon (generated procedurally; skipped gracefully if tools missing).
+if command -v iconutil >/dev/null 2>&1; then
+  echo "==> generating app icon…"
+  if swift Scripts/generate_appicon.swift "${BUILD_DIR}/icon-gen" \
+     && iconutil -c icns "${BUILD_DIR}/icon-gen/AgentDex.iconset" -o "${APP}/Contents/Resources/AppIcon.icns"; then
+    echo "    icon embedded"
+  else
+    echo "    (icon generation failed; continuing without icon)"
+  fi
+fi
+
 # 3) Info.plist — makes it a real GUI app (menu bar, dock icon, activation).
 cat > "${APP}/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -52,6 +63,7 @@ cat > "${APP}/Contents/Info.plist" <<PLIST
   <key>CFBundleDisplayName</key>     <string>${APP_NAME}</string>
   <key>CFBundleExecutable</key>      <string>${APP_NAME}</string>
   <key>CFBundleIdentifier</key>      <string>${BUNDLE_ID}</string>
+  <key>CFBundleIconFile</key>       <string>AppIcon</string>
   <key>CFBundleVersion</key>         <string>1</string>
   <key>CFBundleShortVersionString</key><string>0.2.0</string>
   <key>CFBundlePackageType</key>     <string>APPL</string>

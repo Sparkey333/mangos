@@ -1,14 +1,24 @@
 import SwiftUI
 import SpriteKit
+import Combine
 import AgentDexCore
 
-/// Hosts the SpriteKit overworld and overlays the in-world battle HUD + catch
-/// mini-game. No screen switch: the fight controls appear over the live scene.
+/// Hosts the SpriteKit overworld with the battle HUD layered on top. Battles
+/// play out IN the world (choreographed by `OverworldScene`) unless the player
+/// opts into classic screen-switch battles in Settings, in which case a sheet
+/// presents `ClassicBattleView` over the live world.
+@MainActor
 public struct OverworldView: View {
     @EnvironmentObject var game: GameState
-    @State private var showCatch = false
-    // Hold the scene so it isn't rebuilt (and reset) on every SwiftUI render.
+
+    // Held in @State so the scene isn't rebuilt (and reset) on every render.
     @State private var scene = OverworldScene()
+    @State private var showCatch = false
+    /// True while the scene is choreographing a batch of battle events;
+    /// the action panel hides so inputs can't pile up mid-animation.
+    @State private var animating = false
+
+    private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     public init() {}
 
@@ -16,136 +26,285 @@ public struct OverworldView: View {
         ZStack {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
-                .onAppear {
-                    scene.onEncounter = {
-                        guard game.wild == nil else { return }
-                        game.roamEncounter()
-                    }
-                }
 
-            VStack {
-                topBar
-                Spacer()
-                // In-world battle panel (overworld / no-screen-switch mode only).
-                if let wild = game.wild, !game.useClassicBattle {
-                    battlePanel(wild: wild)
-                } else if game.wild == nil {
-                    Text("Walk into a roaming daemon to start a fight.")
-                        .font(.caption).padding(8)
-                        .background(.ultraThinMaterial, in: Capsule())
-                        .padding(.bottom, 8)
-                }
-            }
-            .padding()
+            hud
 
-            if showCatch, let wild = game.wild, !game.useClassicBattle {
+            if showCatch, game.inBattle, !game.settings.classicBattles,
+               let wild = game.wildEnemy {
                 CatchOverlayView(
                     wild: wild,
                     spheres: availableSpheres(),
                     onThrow: { sphere, quality in
-                        game.throwSphere(sphere, throwQuality: quality)
+                        Cues.play(.throwStart)
+                        game.act(.throwSphere(sphere, quality: quality))
                         showCatch = false
                     },
                     onCancel: { showCatch = false }
                 )
+                .zIndex(10)
             }
         }
-        // Classic screen-switch battle: presented over the world when enabled.
-        .sheet(isPresented: classicBattlePresented) {
-            if let wild = game.wild {
-                ClassicBattleView(wild: wild)
-                    .environmentObject(game)
+        .onAppear {
+            scene.onEncounter = {
+                Task { @MainActor in
+                    game.startWildEncounter()
+                }
+            }
+            scene.configure(region: game.region, cycle: game.loadCycle)
+        }
+        .onChange(of: game.region.project) { _ in
+            scene.configure(region: game.region, cycle: game.loadCycle)
+        }
+        .onReceive(clock) { _ in
+            scene.updateCycle(game.loadCycle)
+        }
+        .onReceive(game.$eventQueue) { queue in
+            handleEvents(queue)
+        }
+        .onChange(of: game.inBattle) { inBattle in
+            if !inBattle { showCatch = false }
+        }
+        .sheet(isPresented: classicPresented) {
+            ClassicBattleView()
+                .environmentObject(game)
+        }
+    }
+
+    // MARK: - Battle event routing
+
+    /// Drains the event queue and hands the batch to the scene to animate.
+    /// In classic mode the events are drained but not choreographed — the
+    /// classic screen renders from state + the narrated log instead.
+    private func handleEvents(_ queue: [BattleEvent]) {
+        guard !queue.isEmpty else { return }
+        let events = game.consumeEvents()
+        guard !events.isEmpty else { return }
+        if game.settings.classicBattles { return }
+
+        if let first = events.first, case .battleStarted = first {
+            if let enemy = game.wildEnemy {
+                scene.battleBegan(
+                    enemyRecipe: enemy.species.sprite,
+                    enemyAnomalous: enemy.isAnomalous,
+                    playerRecipe: game.activeDaemon?.species.sprite
+                )
+            }
+            Cues.play(.encounter)
+        }
+
+        animating = true
+        scene.choreograph(events) {
+            Task { @MainActor in
+                animating = false
+                if game.session?.isOver == true {
+                    scene.battleEnded()
+                    game.dismissBattle()
+                }
             }
         }
     }
 
-    private var classicBattlePresented: Binding<Bool> {
+    private var classicPresented: Binding<Bool> {
         Binding(
-            get: { game.useClassicBattle && game.wild != nil },
-            set: { presented in if !presented { game.wild = nil } }
+            get: { game.session != nil && game.settings.classicBattles },
+            set: { presented in
+                if !presented { game.dismissBattle() }
+            }
         )
     }
 
-    private var topBar: some View {
-        HStack {
-            if let active = game.save.activeDaemon {
-                hpBadge(for: active, label: "You")
-            }
+    // MARK: - HUD
+
+    private var hud: some View {
+        VStack(spacing: 10) {
+            topBar
             Spacer()
-            Toggle("Classic", isOn: $game.useClassicBattle)
-                .labelsHidden()
-                .toggleStyle(.switch)
-            Text(game.useClassicBattle ? "Classic" : "Overworld").font(.caption2)
-        }
-    }
-
-    private func battlePanel(wild: Daemon) -> some View {
-        VStack(spacing: 8) {
-            hpBadge(for: wild, label: "Wild")
-            // Battle log (last few lines)
-            VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(game.log.suffix(3).enumerated()), id: \.offset) { _, line in
-                    Text(line).font(.caption2).lineLimit(2)
+            if game.inBattle && !game.settings.classicBattles {
+                battleLogBox
+                if !animating, let session = game.session {
+                    battlePanel(session)
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(8)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
-
-            // Move buttons
-            if let active = game.save.activeDaemon {
-                let moves = active.species.moves.isEmpty ? [MovePool.basicStrike] : active.species.moves
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
-                    ForEach(moves) { move in
-                        Button {
-                            game.playerAttack(with: move)
-                        } label: {
-                            VStack(spacing: 2) {
-                                Text(move.name).font(.caption).bold()
-                                Text("\(move.aspect.rawValue) · \(move.power > 0 ? "\(move.power)" : "status")")
-                                    .font(.caption2).foregroundStyle(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                }
-            }
-
-            HStack {
-                Button("Throw Sphere") { showCatch = true }
-                    .buttonStyle(.borderedProminent)
-                Button("Flee") { game.wild = nil }
-                    .buttonStyle(.bordered)
+            } else if !game.inBattle {
+                idleFooter
             }
         }
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func hpBadge(for daemon: Daemon, label: String) -> some View {
-        HStack(spacing: 8) {
-            DaemonSprite(recipe: daemon.species.sprite, size: 36)
+    private var topBar: some View {
+        HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(label): \(daemon.species.name) Lv\(daemon.level)").font(.caption).bold()
-                ProgressView(value: daemon.hpFraction)
-                    .frame(width: 120)
-                    .tint(daemon.hpFraction > 0.3 ? .green : .red)
-                if daemon.status != .none {
-                    Text(daemon.status.rawValue.uppercased())
-                        .font(.caption2).foregroundStyle(.orange)
+                Text(game.region.displayName)
+                    .font(.caption.weight(.bold))
+                Text(game.loadCycle.displayName)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+
+            Spacer()
+
+            Text("\(game.save.cycles)¢")
+                .font(.caption.weight(.bold))
+                .monospacedDigit()
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+
+            if let lead = game.activeDaemon {
+                leadBadge(lead)
+            }
+        }
+    }
+
+    private func leadBadge(_ lead: Daemon) -> some View {
+        HStack(spacing: 6) {
+            DaemonSprite(recipe: lead.species.sprite, size: 36, anomalous: lead.isAnomalous)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(lead.species.name) Lv\(lead.level)")
+                    .font(.caption2.weight(.bold))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                ProgressView(value: lead.hpFraction)
+                    .frame(width: 76)
+                    .tint(lead.hpFraction > 0.5 ? .green : (lead.hpFraction > 0.25 ? .yellow : .red))
+                if lead.status != .none {
+                    WorldStatusTag(status: lead.status)
                 }
             }
         }
         .padding(6)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 
-    private func availableSpheres() -> [(sphere: Sphere, count: Int)] {
-        let all: [Sphere] = [.orb, .bindOrb, .resonantOrb, .primeSigil]
-        return all.compactMap { s in
-            let c = game.save.sphereCount(s)
-            return c > 0 ? (s, c) : nil
+    private var battleLogBox: some View {
+        let lines = Array(game.battleLog.suffix(3))
+        return VStack(alignment: .leading, spacing: 2) {
+            ForEach(lines.indices, id: \.self) { i in
+                Text(lines[i])
+                    .font(.caption2)
+                    .monospacedDigit()
+                    .lineLimit(2)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(8)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    // MARK: - Battle panel
+
+    private func battlePanel(_ session: BattleSession) -> some View {
+        let moves = session.activeDaemon.moves.isEmpty
+            ? [MovePool.basicStrike]
+            : session.activeDaemon.moves
+        return VStack(spacing: 8) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(moves) { move in
+                    Button {
+                        game.act(.move(move))
+                    } label: {
+                        VStack(spacing: 2) {
+                            Text(move.name)
+                                .font(.caption.weight(.bold))
+                                .lineLimit(1)
+                            Text("\(move.aspect.rawValue.capitalized) · \(move.power > 0 ? "\(move.power)" : "status")")
+                                .font(.caption2)
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+
+            HStack(spacing: 8) {
+                if !session.isTrainerBattle {
+                    Button("Throw Sphere") { showCatch = true }
+                        .buttonStyle(.borderedProminent)
+                }
+                itemsMenu
+                switchMenu(session)
+                Button("Flee") { game.act(.flee) }
+                    .buttonStyle(.bordered)
+            }
+            .font(.caption)
+        }
+        .padding(10)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .disabled(session.isOver)
+    }
+
+    private var itemsMenu: some View {
+        Menu {
+            ForEach(Item.all) { item in
+                let count = game.save.itemCount(item)
+                if count > 0 {
+                    Button("\(item.name) ×\(count)") {
+                        game.act(.useItem(item))
+                    }
+                }
+            }
+        } label: {
+            Text("Items")
+        }
+    }
+
+    private func switchMenu(_ session: BattleSession) -> some View {
+        Menu {
+            ForEach(session.party.indices, id: \.self) { i in
+                if i != session.activeIndex && !session.party[i].isFainted {
+                    Button("\(session.party[i].species.name) Lv\(session.party[i].level)") {
+                        game.act(.switchTo(i))
+                    }
+                }
+            }
+        } label: {
+            Text("Switch")
+        }
+    }
+
+    private var idleFooter: some View {
+        VStack(spacing: 8) {
+            if game.currentQuest?.giverNPC == "rival_rune" {
+                Button {
+                    game.startRivalBattle()
+                } label: {
+                    Label("Duel Rune", systemImage: "bolt.fill")
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            Text("Wander near the tall code — wild daemons find you.")
+                .font(.caption2)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: Capsule())
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func availableSpheres() -> [(sphere: Sphere, count: Int)] {
+        Sphere.shopCatalog.compactMap { s -> (sphere: Sphere, count: Int)? in
+            let c = game.save.sphereCount(s)
+            return c > 0 ? (sphere: s, count: c) : nil
+        }
+    }
+}
+
+/// Tiny status pill tinted with the condition's signature color.
+private struct WorldStatusTag: View {
+    let status: DaemonStatus
+
+    var body: some View {
+        Text(status.displayName)
+            .font(.system(size: 8, weight: .heavy))
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .foregroundStyle(Color(hex: status.colorHex))
+            .background(Color(hex: status.colorHex).opacity(0.22), in: Capsule())
     }
 }
