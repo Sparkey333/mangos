@@ -33,6 +33,11 @@ cd AgentDex
 Produces **`build/AgentDex.dmg`**. Double-click it, drag **AgentDex** to
 Applications, and launch from Launchpad — the full install-and-play experience.
 
+> `make_dmg.sh` now embeds a **generated app icon** automatically: it renders
+> the icon procedurally (`Scripts/generate_appicon.swift`) and packs it into an
+> `.icns` with `iconutil`, which ships with the Xcode command line tools. If
+> `iconutil` is missing the build simply continues without an icon.
+
 Because the DMG is **unsigned / un-notarized**, macOS Gatekeeper will warn on first
 launch. Either:
 - Right-click the app → **Open** → **Open** (one-time), or
@@ -84,3 +89,28 @@ the built-in sample roster.
   confirm both app + widget targets share the `group.agentdex` App Group.
 - **XcodeGen errors** → ensure `brew install xcodegen` succeeded; re-run
   `xcodegen generate`.
+
+---
+
+## Your first 10 minutes
+
+A no-spoilers path through the v0.3 loop once the app is running:
+
+1. **Pick a starter.** Onboarding offers up to three low-tier, aspect-diverse
+   daemons. There is no wrong answer; there is a *funnier* answer.
+2. **Roam.** Walk the overworld until you bump a **presence orb** — that shimmer
+   is a wild daemon. Approach it to start a fight in place (no screen switch).
+3. **Weaken, then bind.** Knock its HP down (a status like STALLED helps), then
+   throw a Sphere: release when the resonance ring is tight. Watch the shakes —
+   one sharp shake means a critical capture.
+4. **Check the Dex.** Your new daemon's entry shows its stats, aspect, ability,
+   and its opinion about being caught.
+5. **Talk to the NPCs.** Quests auto-track in the journal as you play — the
+   main arc ("The Silent Orchestrator") advances through exactly the things
+   you'd do anyway.
+6. **Spend your Cycles.** Fights and quests pay out; buy a couple of
+   **Hotfixes** from Vex before you need them, because you will need them.
+7. **Duel Rune.** When the journal says your rival is waiting, go win. Or lose
+   informatively — Rune scales with you either way.
+8. **Ascend your starter.** Hit its tier threshold and it promotes. New form,
+   new stats, same soul.
