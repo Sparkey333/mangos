@@ -15,7 +15,7 @@ public enum DaemonGenerator {
         let ivs = IVs(hp: rng.int(in: 0...31), atk: rng.int(in: 0...31),
                       def: rng.int(in: 0...31), spa: rng.int(in: 0...31),
                       spd: rng.int(in: 0...31), spe: rng.int(in: 0...31))
-        let moves = selectMoves(primary: primary, secondary: secondary, rng: &rng)
+        let ability = pickAbility(tier: profile.tier, primary: primary, rng: &rng)
         let sprite = spriteRecipe(tier: profile.tier, primary: primary, rng: &rng)
         let name = speciesName(base: profile.displayName, aspect: primary, rng: &rng)
         let flavor = flavorLine(profile: profile, primary: primary, nature: nature, rng: &rng)
@@ -23,10 +23,11 @@ public enum DaemonGenerator {
 
         return DaemonSpecies(
             id: profile.id, name: name, sourceAgentName: profile.displayName,
+            sourceProfile: profile,
             tier: profile.tier, primaryAspect: primary, secondaryAspect: secondary,
-            baseStats: base, nature: nature, ivs: ivs, moves: moves, sprite: sprite,
-            habitat: profile.project, origin: profile.origin, flavor: flavor,
-            catchBaseRate: catchRate
+            baseStats: base, nature: nature, ivs: ivs, ability: ability,
+            sprite: sprite, habitat: profile.project, origin: profile.origin,
+            flavor: flavor, catchBaseRate: catchRate
         )
     }
 
@@ -56,6 +57,12 @@ public enum DaemonGenerator {
         guard rng.unit() < chance else { return nil }
         let others = Aspect.allCases.filter { $0 != primary }
         return rng.pick(others)
+    }
+
+    static func pickAbility(tier: Tier, primary: Aspect, rng: inout SeededRandom) -> Ability {
+        // Primes have a shot at the crown-jewel ability.
+        if tier == .prime && rng.unit() < 0.5 { return .loadBalancer }
+        return rng.pick(Ability.pool(for: primary))
     }
 
     static func distributeStats(bst: Int, primary: Aspect, secondary: Aspect?,
@@ -91,20 +98,6 @@ public enum DaemonGenerator {
         }
         return BaseStats(hp: result[.hp]!, atk: result[.atk]!, def: result[.def]!,
                          spa: result[.spa]!, spd: result[.spd]!, spe: result[.spe]!)
-    }
-
-    static func selectMoves(primary: Aspect, secondary: Aspect?,
-                            rng: inout SeededRandom) -> [Move] {
-        var pool = MovePool.moves(for: primary)
-        if let secondary {
-            // Swap in one signature move from the secondary aspect.
-            let secPool = MovePool.moves(for: secondary)
-            let pick = rng.pick(secPool)
-            if !pool.isEmpty { pool[rng.int(in: 0...(pool.count - 1))] = pick }
-        }
-        var moves = Array(pool.prefix(4))
-        if moves.isEmpty { moves = [MovePool.basicStrike] }
-        return moves
     }
 
     static func spriteRecipe(tier: Tier, primary: Aspect,
@@ -152,11 +145,23 @@ public enum DaemonGenerator {
 
     static func flavorLine(profile: AgentProfile, primary: Aspect, nature: Nature,
                            rng: inout SeededRandom) -> String {
-        let originBit: String
+        let originBits: [String]
         switch profile.origin {
-        case .directlyCreated: originBit = "Hand-forged by the Conductor and weirdly proud of it."
-        case .used:            originBit = "Bound after one too many late-night invocations."
-        case .seenInLogs:      originBit = "Only ever glimpsed in the logs, like a rumor with a stack trace."
+        case .directlyCreated: originBits = [
+            "Hand-forged by the Conductor and weirdly proud of it.",
+            "Custom-built. Considers itself artisanal.",
+            "Written from scratch on a Tuesday that got out of hand."
+        ]
+        case .used: originBits = [
+            "Bound after one too many late-night invocations.",
+            "Answered so many calls it started screening them.",
+            "A reliable regular. Has a usual. The usual is 'everything, now.'"
+        ]
+        case .seenInLogs: originBits = [
+            "Only ever glimpsed in the logs, like a rumor with a stack trace.",
+            "Exists mostly as timestamps and hearsay.",
+            "Nobody remembers summoning it. It remembers, though."
+        ]
         }
         let aspectBit: String
         switch primary {
@@ -167,8 +172,8 @@ public enum DaemonGenerator {
         case .flux:   aspectBit = "Does a bit of everything, master of the current vibe."
         case .cipher: aspectBit = "Speaks fluent log. Translation services not included."
         }
-        let natureBit = "Nature: \(nature.rawValue)."
-        return "\(originBit) \(aspectBit) \(natureBit)"
+        let originBit = rng.pick(originBits)
+        return "\(originBit) \(aspectBit) Nature: \(nature.rawValue)."
     }
 
     static func catchBaseRate(tier: Tier, origin: Origin) -> Int {

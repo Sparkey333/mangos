@@ -43,6 +43,40 @@ public enum Tier: String, Codable, CaseIterable, Comparable, Sendable {
         }
     }
 
+    /// Level at which a daemon of this tier Ascends (its evolution). Primes
+    /// ascend late — reaching Zenith is endgame material.
+    public var ascensionLevel: Int? {
+        switch self {
+        case .sub:          return 18
+        case .task:         return 28
+        case .specialist:   return 36
+        case .orchestrator: return 45
+        case .prime:        return 60
+        }
+    }
+
+    /// Cycles (currency) payout multiplier for defeating this tier.
+    public var payoutMultiplier: Int {
+        switch self {
+        case .sub:          return 4
+        case .task:         return 6
+        case .specialist:   return 10
+        case .orchestrator: return 16
+        case .prime:        return 40
+        }
+    }
+
+    /// Base XP yield when a daemon of this tier is defeated.
+    public var xpYield: Int {
+        switch self {
+        case .sub:          return 40
+        case .task:         return 70
+        case .specialist:   return 120
+        case .orchestrator: return 180
+        case .prime:        return 280
+        }
+    }
+
     /// Suggested starting level band, before per-daemon usage hints are applied.
     public var baseLevelBand: ClosedRange<Int> {
         switch self {
