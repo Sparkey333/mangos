@@ -652,7 +652,8 @@ public final class OverworldScene: SKScene {
 
     private func renderSphereThrow(shakes: Int, captured: Bool, critical: Bool) {
         guard let enemy = enemyNode else { return }
-        Cues.play(.throwStart)
+        // Note: the throw-start cue is played by the HUD when the player
+        // commits the throw, so the scene doesn't repeat it here.
 
         let start = (allyNode ?? player).position
         let target = enemy.position
