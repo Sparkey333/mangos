@@ -167,7 +167,7 @@ public struct OverworldView: View {
                     .font(.caption2.weight(.bold))
                     .monospacedDigit()
                     .lineLimit(1)
-                ProgressView(value: lead.hpFraction)
+                ProgressView(value: max(0, min(1, lead.hpFraction)))
                     .frame(width: 76)
                     .tint(lead.hpFraction > 0.5 ? .green : (lead.hpFraction > 0.25 ? .yellow : .red))
                 if lead.status != .none {
