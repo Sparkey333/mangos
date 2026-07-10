@@ -102,13 +102,15 @@ public struct DaemonSprite: View {
             .frame(width: size * 0.05, height: size * 0.05)
     }
 
-    @ViewBuilder private var sigilShape: some View {
+    // A concrete Shape (not `some View`) so `.fill(_:)` is available at the
+    // call site; a @ViewBuilder switch would erase to View and lose it.
+    private var sigilShape: AnyShape {
         switch recipe.sigil {
-        case .spark:    Circle()
-        case .arrow:    Capsule()
-        case .triangle: RegularPolygon(sides: 3)
-        case .hexagon:  RegularPolygon(sides: 6)
-        case .mandala:  RegularPolygon(sides: 12)
+        case .spark:    return AnyShape(Circle())
+        case .arrow:    return AnyShape(Capsule())
+        case .triangle: return AnyShape(RegularPolygon(sides: 3))
+        case .hexagon:  return AnyShape(RegularPolygon(sides: 6))
+        case .mandala:  return AnyShape(RegularPolygon(sides: 12))
         }
     }
 

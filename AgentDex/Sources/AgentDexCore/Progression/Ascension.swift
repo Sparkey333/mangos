@@ -16,7 +16,8 @@ public enum Ascension {
 
     /// Whether a daemon at `level` qualifies to ascend.
     public static func canAscend(_ species: DaemonSpecies, at level: Int) -> Bool {
-        guard let threshold = level(for: species) else { return false }
+        // Self-qualified: the `level` parameter shadows the function name.
+        guard let threshold = Self.level(for: species) else { return false }
         return level >= threshold
     }
 
