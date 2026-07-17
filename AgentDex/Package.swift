@@ -13,7 +13,9 @@ let package = Package(
         // A macOS-runnable build of the game via `swift run AgentDexApp`.
         .executable(name: "AgentDexApp", targets: ["AgentDexApp"]),
         // The agent-roster importer CLI: `swift run agentdex-import ...`.
-        .executable(name: "agentdex-import", targets: ["agentdex-import"])
+        .executable(name: "agentdex-import", targets: ["agentdex-import"]),
+        // The art prompt/generation CLI: `swift run agentdex-artgen ...`.
+        .executable(name: "agentdex-artgen", targets: ["agentdex-artgen"])
     ],
     targets: [
         .target(
@@ -29,6 +31,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "agentdex-import",
+            dependencies: ["AgentDexImport", "AgentDexCore"]
+        ),
+        .executableTarget(
+            name: "agentdex-artgen",
             dependencies: ["AgentDexImport", "AgentDexCore"]
         ),
         // SwiftUI + SpriteKit app. Builds for iOS/macOS (Apple platforms only).
