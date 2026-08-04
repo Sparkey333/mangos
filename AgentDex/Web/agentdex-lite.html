@@ -1,0 +1,475 @@
+<title>AgentDex Lite</title>
+<meta name="description" content="A playable browser slice of AgentDex — roam, fight, and bind the souls of your agents.">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0A0F1E; --bg2:#070B16; --panel:#121B2E; --panel2:#0E1626;
+    --line:#24324b; --ink:#E8EEF7; --muted:#7C8AA5;
+    --aether:#7FD7FF; --cipher:#43FF8E; --warden:#8FA3B8;
+    --forge:#FF6A3D; --order:#9B8CFF; --flux:#C9A0FF;
+    --glow:#7FD7FF; --good:#43FF8E; --bad:#FF6A3D; --warn:#FFD34D;
+    --mono:ui-monospace,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:
+     radial-gradient(1200px 600px at 50% -10%, #101a30 0%, var(--bg) 55%, var(--bg2) 100%);
+     color:var(--ink);font-family:var(--sans);min-height:100%}
+  .wrap{max-width:520px;margin:0 auto;padding:14px 14px 26px}
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .brand{font-family:var(--mono);font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+     font-size:15px;color:var(--ink);text-shadow:0 0 18px rgba(127,215,255,.35)}
+  .brand b{color:var(--glow)}
+  .tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .stage{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+     background:var(--panel2);box-shadow:0 10px 40px rgba(0,0,0,.5),inset 0 0 60px rgba(6,10,22,.6)}
+  canvas{display:block;width:100%;height:auto;image-rendering:optimizeSpeed;touch-action:none}
+  .hud{position:absolute;inset:0;pointer-events:none;font-family:var(--mono)}
+  .lead{position:absolute;top:8px;left:8px;display:flex;gap:8px;align-items:center;
+     background:rgba(9,14,27,.7);border:1px solid var(--line);border-radius:10px;padding:6px 8px;backdrop-filter:blur(4px)}
+  .lead .nm{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .lead .sub{font-size:9px;color:var(--muted)}
+  .bar{width:96px;height:6px;border-radius:4px;background:#1b2740;overflow:hidden;margin-top:3px}
+  .bar > i{display:block;height:100%;background:var(--good);transition:width .25s}
+  .cyc{position:absolute;top:8px;right:8px;background:rgba(9,14,27,.7);border:1px solid var(--line);
+     border-radius:10px;padding:6px 10px;font-size:11px;letter-spacing:.06em}
+  .cyc b{color:var(--warn);font-variant-numeric:tabular-nums}
+  .cycle{position:absolute;top:44px;right:8px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:10px;letter-spacing:.1em;
+     text-transform:uppercase;color:var(--muted)}
+  .toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);max-width:88%;
+     background:rgba(10,16,30,.92);border:1px solid var(--glow);border-radius:10px;padding:8px 12px;
+     font-family:var(--sans);font-size:12px;line-height:1.35;box-shadow:0 0 24px rgba(127,215,255,.25);
+     opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(2px)}
+  .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,12,24,.35),rgba(6,9,18,.92));
+     display:none;flex-direction:column;padding:10px}
+  .overlay.on{display:flex}
+  .foe,.you{display:flex;align-items:center;gap:10px}
+  .you{flex-direction:row-reverse;text-align:right}
+  .card{background:rgba(10,16,30,.8);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-family:var(--mono);min-width:150px}
+  .card .nm{font-size:11px;letter-spacing:.06em}
+  .card .lv{font-size:9px;color:var(--muted)}
+  .card .hp{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .stag{font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:1px 5px;border-radius:6px;border:1px solid;display:inline-block;margin-top:2px}
+  .log{flex:1;min-height:52px;margin:8px 0;padding:8px 10px;background:rgba(6,10,20,.7);border:1px solid var(--line);
+     border-radius:10px;font-family:var(--mono);font-size:11px;line-height:1.5;overflow:auto;display:flex;flex-direction:column;justify-content:flex-end}
+  .log div{opacity:.85}
+  .log div:last-child{opacity:1;color:var(--ink)}
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  button{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink);
+     background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 8px;cursor:pointer;
+     transition:border-color .15s,background .15s,transform .05s}
+  button:hover{border-color:var(--glow);background:#16233a}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button .k{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+  .prim{border-color:var(--glow);background:#122233;color:var(--glow)}
+  .row{display:flex;gap:7px}.row>button{flex:1}
+  :focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+  .ring{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column}
+  .ring.on{display:flex}
+  .ringwrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+  .rlabel{font-family:var(--mono);font-size:11px;letter-spacing:.06em;margin-top:6px;color:var(--muted)}
+  .rlabel b{color:var(--good);font-variant-numeric:tabular-nums}
+  .controls{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:12px}
+  .dpad{display:grid;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);gap:5px}
+  .dpad button{padding:0;font-size:16px}
+  .dpad .sp{visibility:hidden}
+  .side{display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+  .side .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .panel{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:12px}
+  .panel h2{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 8px;color:var(--muted)}
+  .dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+  .mon{border:1px solid var(--line);border-radius:10px;padding:7px;background:var(--panel);text-align:center}
+  .mon canvas{width:56px;height:56px;margin:0 auto}
+  .mon .mn{font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;margin-top:3px}
+  .mon .mt{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .mon.ghost{opacity:.32}
+  .foot{margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5;font-family:var(--sans)}
+  .foot code{font-family:var(--mono);color:var(--aether);font-size:10.5px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><b>Agent</b>Dex <span style="opacity:.5">Lite</span></div>
+    <div class="tag">browser slice · v0.3</div>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="world" width="492" height="360"></canvas>
+    <div class="hud">
+      <div class="lead" id="lead" style="display:none">
+        <canvas id="leadArt" width="34" height="34" style="width:34px;height:34px"></canvas>
+        <div>
+          <div class="nm" id="leadNm">—</div>
+          <div class="sub" id="leadSub">Lv —</div>
+          <div class="bar"><i id="leadHp" style="width:100%"></i></div>
+        </div>
+      </div>
+      <div class="cyc">◈ <b id="cyc">200</b></div>
+      <div class="cycle" id="cycle">Idle Hours</div>
+      <div class="hint" id="hint">move with arrows / WASD · bump a presence orb</div>
+      <div class="toast" id="toast"></div>
+
+      <div class="overlay" id="battle">
+        <div class="foe">
+          <canvas id="foeArt" width="72" height="72" style="width:72px;height:72px"></canvas>
+          <div class="card">
+            <div class="nm" id="foeNm">—</div><div class="lv" id="foeLv">Lv —</div>
+            <div class="bar"><i id="foeHp" style="width:100%"></i></div>
+            <div class="hp" id="foeHpN">—</div>
+            <span class="stag" id="foeStat" style="display:none"></span>
+          </div>
+        </div>
+        <div class="log" id="log"></div>
+        <div class="you">
+          <canvas id="youArt" width="64" height="64" style="width:64px;height:64px"></canvas>
+          <div class="card">
+            <div class="nm" id="youNm">—</div><div class="lv" id="youLv">Lv —</div>
+            <div class="bar"><i id="youHp" style="width:100%"></i></div>
+            <div class="hp" id="youHpN">—</div>
+            <span class="stag" id="youStat" style="display:none"></span>
+          </div>
+        </div>
+        <div id="menu" class="menu"></div>
+      </div>
+
+      <div class="ring" id="ring">
+        <div class="ringwrap">
+          <canvas id="ringArt" width="120" height="120" style="width:120px;height:120px"></canvas>
+          <canvas id="ringFx" width="220" height="220" style="width:220px;height:220px;position:absolute;inset:0"></canvas>
+        </div>
+        <div class="rlabel">bind chance <b id="rpct">0%</b> · tap THROW when tight</div>
+        <div class="row" style="width:220px;margin-top:8px">
+          <button class="prim" id="throwBtn">THROW</button>
+          <button id="ringCancel">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="dpad">
+      <span class="sp"></span><button data-d="up">▲</button><span class="sp"></span>
+      <button data-d="left">◀</button><span class="sp"></span><button data-d="right">▶</button>
+      <span class="sp"></span><button data-d="down">▼</button><span class="sp"></span>
+    </div>
+    <div class="side">
+      <span class="lbl">roster: 7 daemons</span>
+      <button id="dexToggle">Open Dex ▾</button>
+    </div>
+  </div>
+
+  <div class="panel" id="dexPanel" style="display:none">
+    <h2>Dex — <span id="dexCount">0</span> bound · <span id="dexSeen">0</span> seen</h2>
+    <div class="dex" id="dexGrid"></div>
+  </div>
+
+  <p class="foot">
+    A faithful browser slice of the native app: same roster, six <b>aspects</b> in a cyclic type chart,
+    procedural creatures, and ring-timed catching. The real thing is a SwiftUI + SpriteKit game —
+    build it on a Mac with <code>./Scripts/run.sh</code> or <code>./Scripts/make_dmg.sh</code>.
+  </p>
+</div>
+
+<script>
+"use strict";
+function fnv(str){let h=0x811c9dc5>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}return h>>>0;}
+function mulberry(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+const ASPECTS=["aether","cipher","warden","forge","order","flux"];
+const AC={aether:"#7FD7FF",cipher:"#43FF8E",warden:"#8FA3B8",forge:"#FF6A3D",order:"#9B8CFF",flux:"#C9A0FF"};
+const AC2={aether:"#FFFFFF",cipher:"#0B1A12",warden:"#384650",forge:"#3A2018",order:"#E8E3FF",flux:"#5BE3C0"};
+function eff(atk,def){const i=ASPECTS.indexOf(atk),j=ASPECTS.indexOf(def),n=ASPECTS.length;
+  if((i+1)%n===j)return 1.5; if((j+1)%n===i)return 0.67; return 1;}
+function aspectFromRole(r){r=r.toLowerCase();
+  if(/research|explore|search|read/.test(r))return"aether";
+  if(/cod|build|implement|dev|writ/.test(r))return"forge";
+  if(/plan|architect|design|orchestrat|coordinat/.test(r))return"order";
+  if(/review|critic|security|audit|test|guard/.test(r))return"warden";
+  if(/data|pars|transform|log|index|embed/.test(r))return"cipher";
+  return"flux";}
+
+const ROSTER=[
+  {id:"explore",name:"Explore",tier:"specialist",role:"researcher"},
+  {id:"plan",name:"Plan",tier:"specialist",role:"architect"},
+  {id:"general",name:"General-Purpose",tier:"task",role:"general"},
+  {id:"code-reviewer",name:"Code Reviewer",tier:"specialist",role:"review security"},
+  {id:"log-scout",name:"Log Scout",tier:"sub",role:"log parsing"},
+  {id:"builder",name:"Builder",tier:"task",role:"coder implementer"},
+  {id:"prime-orchestra",name:"Maestro",tier:"prime",role:"orchestrator planner"},
+];
+const TIER={sub:{bst:200,sides:1,band:[2,6],rate:200,aura:.2,weight:50},
+  task:{bst:300,sides:2,band:[4,10],rate:150,aura:.35,weight:30},
+  specialist:{bst:420,sides:3,band:[8,18],rate:90,aura:.55,weight:14},
+  orchestrator:{bst:520,sides:6,band:[16,30],rate:45,aura:.8,weight:5},
+  prime:{bst:600,sides:12,band:[30,44],rate:8,aura:1,weight:1}};
+const MOVES={
+  aether:[["Glimmer",35],["Knowledge Beam",75],["Insight Nova",110],["Skim",50]],
+  forge:[["Spark",40],["Hammer Pass",80],["Meltdown",120],["Rivet Rush",45]],
+  order:[["Shard",45],["Lattice",78],["Grand Blueprint",105],["Deadline",60]],
+  warden:[["Rune Bash",45],["Audit Strike",70],["Bulwark Slam",100],["Quarantine",55]],
+  flux:[["Shift",40],["Iridescent Surge",80],["Unwind",100],["Pivot",50]],
+  cipher:[["Static",38],["Glitch",76],["Corrupt",112],["Zero Day",70]],
+};
+const SUFFIX={aether:["lux","ari","sol"],forge:["mok","dross","kor"],order:["geon","alis","dex"],
+  warden:["gar","thol","rune"],flux:["morph","shi","vex"],cipher:["hex","null","zib"]};
+
+function genSpecies(agent){
+  const rng=mulberry(fnv(agent.id+"|mangos"));
+  const aspect=aspectFromRole(agent.role);
+  const t=TIER[agent.tier];
+  const w={aether:[.9,.7,.8,1.3],forge:[1.1,1.5,1.2,.9],order:[1,.8,1.3,.7],
+    warden:[1.4,.9,1.5,.6],flux:[1,1,1,1.1],cipher:[.9,1.1,.8,1.4]}[aspect];
+  let raw=w.map(x=>x*(0.9+0.2*rng())),tot=raw.reduce((a,b)=>a+b,0);
+  let st=raw.map(x=>Math.max(15,Math.round(t.bst*(x/tot))));
+  const root=(agent.name.toLowerCase().replace(/[^a-z]/g,"").slice(0,5))||"dae";
+  const suf=SUFFIX[aspect][Math.floor(rng()*3)];
+  const name=(root+suf).replace(/^./,c=>c.toUpperCase());
+  const level=t.band[0]+Math.floor(rng()*(t.band[1]-t.band[0]+1));
+  return {id:agent.id,name,aspect,tier:agent.tier,base:{hp:st[0],atk:st[1],def:st[2],spe:st[3]},
+    level,rate:t.rate,aura:t.aura,sides:t.sides,p1:AC[aspect],p2:AC2[aspect],moves:MOVES[aspect]};
+}
+const SPECIES=ROSTER.map(genSpecies);
+const byId=Object.fromEntries(SPECIES.map(s=>[s.id,s]));
+
+function statAt(base,lvl,isHP){return isHP?Math.floor(2*base*lvl/100)+lvl+10:Math.floor(2*base*lvl/100)+5;}
+function mkDaemon(sp,lvl){lvl=lvl||sp.level;const hp=statAt(sp.base.hp,lvl,true);
+  return {sp,level:lvl,maxhp:hp,hp,atk:statAt(sp.base.atk,lvl),def:statAt(sp.base.def,lvl),
+    spe:statAt(sp.base.spe,lvl),status:null};}
+
+function drawMon(cv,sp,anom,t){
+  const ctx=cv.getContext("2d"),W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=Math.min(W,H)*0.30;
+  ctx.clearRect(0,0,W,H);
+  let p1=sp.p1,p2=sp.p2;
+  if(anom){p1=hueShift(p1,180);p2=hueShift(p2,180);}
+  const g=ctx.createRadialGradient(cx,cy,R*0.3,cx,cy,R*1.7);
+  g.addColorStop(0,hexA(p1,0.22+0.35*sp.aura));g.addColorStop(1,hexA(p1,0));
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R*1.7,0,7);ctx.fill();
+  const sides=sp.sides,ang=(t||0)*0.0006;
+  const grd=ctx.createLinearGradient(cx,cy-R,cx,cy+R);grd.addColorStop(0,p1);grd.addColorStop(1,p2);
+  ctx.fillStyle=grd;ctx.strokeStyle=p2;ctx.lineWidth=Math.max(1,W*0.02);
+  ctx.beginPath();
+  if(sides<=1){ctx.arc(cx,cy,R,0,7);}
+  else{for(let i=0;i<Math.max(3,sides);i++){const a=ang+i/Math.max(3,sides)*Math.PI*2-Math.PI/2;
+    const x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();}
+  ctx.shadowColor=p1;ctx.shadowBlur=W*0.12;ctx.fill();ctx.shadowBlur=0;ctx.stroke();
+  const dn=Math.max(1,sp.sides);
+  for(let i=0;i<dn;i++){const a=-(t||0)*0.001+i/dn*Math.PI*2;
+    ctx.fillStyle=p2;ctx.beginPath();ctx.arc(cx+R*1.35*Math.cos(a),cy+R*1.35*Math.sin(a),W*0.035,0,7);ctx.fill();}
+  if(anom){for(let i=0;i<3;i++){const a=i*2.1;ctx.fillStyle="rgba(255,255,255,"+(0.4+0.4*Math.sin((t||0)*0.006+i))+")";
+    ctx.beginPath();ctx.arc(cx+R*Math.cos(a),cy+R*Math.sin(a),W*0.02,0,7);ctx.fill();}}
+}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function hueShift(h,deg){let n=parseInt(h.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;
+  r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let hh,s,l=(mx+mn)/2;
+  if(mx===mn){hh=s=0;}else{const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);
+    hh=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;hh/=6;}
+  hh=(hh+deg/360)%1;function f(p,q,t){if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;
+    if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;}
+  const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;
+  const R=Math.round(f(p,q,hh+1/3)*255),G=Math.round(f(p,q,hh)*255),B=Math.round(f(p,q,hh-1/3)*255);
+  return"#"+((1<<24)+(R<<16)+(G<<8)+B).toString(16).slice(1);}
+
+const state={cycles:200,party:[],dex:{},seen:{}};
+state.party.push(mkDaemon(byId["general"],5));
+state.dex["general"]="caught";
+
+const world=document.getElementById("world"),wctx=world.getContext("2d");
+const player={x:246,y:250};
+const orbs=[];for(let i=0;i<3;i++)orbs.push({x:60+i*120,y:60+i*40,tx:0,ty:0,pulse:i*2});
+orbs.forEach(reTarget);
+function reTarget(o){o.tx=40+((fnv("t"+o.pulse+o.x)%410));o.ty=30+((fnv("u"+o.pulse+o.y)%220));}
+let keys={},battle=null,lastEnc=0,cyclePhase=0,tPrev=0;
+const CYCLES=[["Idle Hours","#1B2838"],["Busy Hours","#101822"],["Peak Load","#2A1030"]];
+
+function step(t){
+  tPrev=t;
+  cyclePhase=Math.floor(t/20000)%3;
+  document.getElementById("cycle").textContent=CYCLES[cyclePhase][0];
+  if(!battle){
+    let ax=(keys.right?1:0)-(keys.left?1:0),ay=(keys.down?1:0)-(keys.up?1:0);
+    player.x=Math.max(14,Math.min(world.width-14,player.x+ax*2.4));
+    player.y=Math.max(14,Math.min(world.height-14,player.y+ay*2.4));
+    orbs.forEach(o=>{const dx=o.tx-o.x,dy=o.ty-o.y,d=Math.hypot(dx,dy);
+      if(d<4)reTarget(o);else{o.x+=dx/d*0.7;o.y+=dy/d*0.7;}o.pulse+=0.05;
+      if(t-lastEnc>900&&Math.hypot(o.x-player.x,o.y-player.y)<26){lastEnc=t;startBattle();}});
+  }
+  drawWorld(t);
+  requestAnimationFrame(step);
+}
+function drawWorld(t){
+  wctx.fillStyle=CYCLES[cyclePhase][1];wctx.fillRect(0,0,world.width,world.height);
+  wctx.fillStyle="rgba(57,181,74,0.06)";
+  for(let i=0;i<40;i++){const x=(i*97+37)%world.width,y=(i*61+i*i*13)%world.height;wctx.fillRect(x,y,6+(i%4)*3,6+(i%3)*3);}
+  orbs.forEach(o=>{const r=11+Math.sin(o.pulse)*2;
+    wctx.fillStyle="rgba(200,240,255,0.16)";wctx.beginPath();wctx.arc(o.x,o.y,r+6,0,7);wctx.fill();
+    wctx.fillStyle="rgba(220,245,255,0.7)";wctx.beginPath();wctx.arc(o.x,o.y,r,0,7);wctx.fill();
+    wctx.fillStyle="#0A0F1E";wctx.beginPath();wctx.arc(o.x,o.y,r*0.4,0,7);wctx.fill();});
+  wctx.shadowColor="#7FD7FF";wctx.shadowBlur=14;wctx.fillStyle="#EAF6FF";
+  wctx.beginPath();wctx.arc(player.x,player.y,10,0,7);wctx.fill();wctx.shadowBlur=0;
+  wctx.strokeStyle="rgba(127,215,255,0.5)";wctx.lineWidth=2;
+  wctx.beginPath();wctx.arc(player.x,player.y,15+Math.sin(t*0.004)*2,0,7);wctx.stroke();
+}
+
+const $=id=>document.getElementById(id);
+function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");
+  clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),2600);}
+function log(msg){const l=$("log");const d=document.createElement("div");d.textContent=msg;l.appendChild(d);
+  while(l.children.length>7)l.removeChild(l.firstChild);l.scrollTop=l.scrollHeight;}
+
+let wildSeed=1;
+function rand(){wildSeed=(wildSeed*1103515245+12345)&0x7fffffff;return wildSeed/0x7fffffff;}
+function rollWild(){
+  const pool=SPECIES.slice();
+  const weights=pool.map(s=>TIER[s.tier].weight*(cyclePhase===2?(s.tier==="prime"?3:s.tier==="orchestrator"?2:1):cyclePhase===0?(s.tier==="sub"||s.tier==="task"?1.4:0.4):1));
+  let r=rand()*weights.reduce((a,b)=>a+b,0),pick=pool[0];
+  for(let i=0;i<pool.length;i++){r-=weights[i];if(r<=0){pick=pool[i];break;}}
+  const anom=rand()<1/24;
+  const d=mkDaemon(pick);d.anom=anom;return d;
+}
+function startBattle(){
+  const foe=rollWild(),you=state.party[0];
+  battle={foe,you,over:false};
+  state.seen[foe.sp.id]=state.seen[foe.sp.id]||"seen";
+  if(state.dex[foe.sp.id]!=="caught")state.dex[foe.sp.id]="seen";
+  $("battle").classList.add("on");$("hint").style.display="none";
+  $("log").innerHTML="";
+  log(`A wild ${foe.sp.name}${foe.anom?" ✦":""} (Lv${foe.level}) appeared!`);
+  if(foe.anom)toast("An anomalous daemon! Shifted colors, coveted everywhere.");
+  renderBattle();buildMenu();
+}
+function renderBattle(){
+  const {foe,you}=battle;
+  drawMon($("foeArt"),foe.sp,foe.anom,performance.now());
+  drawMon($("youArt"),you.sp,false,performance.now());
+  $("foeNm").textContent=foe.sp.name;$("foeLv").textContent="Lv"+foe.level;
+  $("youNm").textContent=you.sp.name;$("youLv").textContent="Lv"+you.level;
+  hpbar($("foeHp"),foe);hpbar($("youHp"),you);
+  $("foeHpN").textContent=Math.max(0,foe.hp)+"/"+foe.maxhp;
+  $("youHpN").textContent=Math.max(0,you.hp)+"/"+you.maxhp;
+  tag($("foeStat"),foe);tag($("youStat"),you);
+  syncLead();
+}
+function hpbar(el,d){const f=Math.max(0,d.hp)/d.maxhp;el.style.width=(f*100)+"%";
+  el.style.background=f>0.5?"var(--good)":f>0.22?"var(--warn)":"var(--bad)";}
+function tag(el,d){if(!d.status){el.style.display="none";return;}
+  el.style.display="inline-block";el.textContent=d.status.toUpperCase();
+  el.style.color=d.status==="stalled"?"#8FA3B8":"#C9A0FF";el.style.borderColor=el.style.color;}
+function buildMenu(){
+  const m=$("menu");m.innerHTML="";
+  battle.you.sp.moves.forEach(mv=>{const b=document.createElement("button");
+    b.innerHTML=`${mv[0]}<span class="k">${battle.you.sp.aspect} · ${mv[1]||"status"}</span>`;
+    b.onclick=()=>playerMove(mv);m.appendChild(b);});
+  const t=document.createElement("button");t.className="prim";t.textContent="Throw Sphere";
+  t.onclick=openRing;m.appendChild(t);
+  const f=document.createElement("button");f.textContent="Flee";
+  f.onclick=()=>{toast("Got away clean.");endBattle();};m.appendChild(f);
+}
+function dmg(a,d,power){
+  const base=(2*a.level/5+2)*power*a.atk/Math.max(1,d.def)/50+2;
+  const stab=1.5,e=eff(a.sp.aspect,d.sp.aspect),roll=0.85+0.3*rand();
+  const crit=rand()<0.0625?1.5:1;
+  return {n:Math.max(1,Math.floor(base*stab*e*roll*crit)),e,crit:crit>1};
+}
+function playerMove(mv){
+  if(battle.over)return;
+  const {you,foe}=battle;
+  const r=dmg(you,foe,mv[1]);foe.hp-=r.n;
+  log(`${you.sp.name} used ${mv[0]}!`+(r.crit?" Critical!":"")+(r.e>1?" Super effective!":r.e<1?" Not very effective…":"")+` (${r.n})`);
+  renderBattle();
+  if(foe.hp<=0){log(`${foe.sp.name} crashed! Victory.`);const pay=foe.level*(TIER[foe.sp.tier].weight<6?12:20);
+    state.cycles+=pay;log(`Earned ◈${pay}.`);endBattle(true);return;}
+  setTimeout(foeMove,420);
+}
+function foeMove(){
+  if(!battle||battle.over)return;const {you,foe}=battle;
+  const mv=foe.sp.moves[Math.floor(rand()*3)];const r=dmg(foe,you,mv[1]);you.hp-=r.n;
+  log(`${foe.sp.name} used ${mv[0]}!`+(r.e>1?" Super effective!":"")+` (${r.n})`);
+  renderBattle();
+  if(you.hp<=0){log(`${you.sp.name} fainted! Rebooted at the clinic.`);you.hp=you.maxhp;
+    toast("Party rebooted at the clinic.");endBattle();}
+}
+
+let ring=null;
+function openRing(){
+  $("ring").classList.add("on");
+  drawMon($("ringArt"),battle.foe.sp,battle.foe.anom,performance.now());
+  ring={scale:1.6,dir:-1,raf:0};
+  const fx=$("ringFx"),fc=fx.getContext("2d");
+  function loop(){
+    ring.scale+=ring.dir*0.02;if(ring.scale<0.35){ring.dir=1;}if(ring.scale>1.6){ring.dir=-1;}
+    const q=Math.max(0,1-Math.abs(ring.scale-0.55)/0.6);
+    $("rpct").textContent=Math.round(catchP(q)*100)+"%";
+    fc.clearRect(0,0,220,220);const R=90*ring.scale;
+    fc.strokeStyle=battle.foe.sp.p1;fc.lineWidth=3;fc.setLineDash([6,6]);
+    fc.beginPath();fc.arc(110,110,R,0,7);fc.stroke();
+    ring.q=q;ring.raf=requestAnimationFrame(loop);
+  }
+  loop();
+}
+function catchP(q){
+  const f=battle.foe,max=f.maxhp,hp=Math.max(0,f.hp),ball=1.0;
+  let a=((3*max-2*hp)*f.sp.rate*ball)/(3*max);
+  if(f.status==="stalled")a*=2.5;a*=(1+0.6*q);
+  if(f.sp.tier==="prime")a=Math.min(a,4);
+  return Math.max(0,Math.min(1,a/255));
+}
+function closeRing(){if(ring){cancelAnimationFrame(ring.raf);ring=null;}$("ring").classList.remove("on");}
+$("ringCancel").onclick=closeRing;
+$("throwBtn").onclick=()=>{
+  const q=ring?ring.q:0,p=catchP(q);closeRing();
+  log(`You threw a Sphere… (${Math.round(p*100)}% at ${q>0.75?"a true throw":"that timing"})`);
+  let shakes=0;const sc=Math.pow(p,0.25);for(let i=0;i<4;i++){if(rand()<sc)shakes++;else break;}
+  if(shakes===4){
+    log(`Gotcha! ${battle.foe.sp.name} was bound!`);
+    const caught=mkDaemon(battle.foe.sp,battle.foe.level);caught.anom=battle.foe.anom;
+    if(state.party.length<6)state.party.push(caught);
+    state.dex[battle.foe.sp.id]="caught";
+    toast(`${battle.foe.sp.name} joined you.${battle.foe.anom?" It's anomalous!":""}`);
+    endBattle(true);
+  }else{log(`So close — ${shakes} shake${shakes===1?"":"s"} — it broke free!`);setTimeout(foeMove,300);}
+};
+
+function endBattle(){if(battle)battle.over=true;$("battle").classList.remove("on");$("hint").style.display="";
+  battle=null;renderDex();syncLead();}
+
+function syncLead(){const d=state.party[0];if(!d)return;
+  $("lead").style.display="flex";drawMon($("leadArt"),d.sp,d.anom,performance.now());
+  $("leadNm").textContent=d.sp.name;$("leadSub").textContent="Lv"+d.level+" · "+d.sp.aspect;
+  const f=Math.max(0,d.hp)/d.maxhp;$("leadHp").style.width=(f*100)+"%";
+  $("leadHp").style.background=f>0.5?"var(--good)":f>0.22?"var(--warn)":"var(--bad)";
+  $("cyc").textContent=state.cycles;}
+
+function renderDex(){
+  const g=$("dexGrid");g.innerHTML="";let caught=0,seen=0;
+  SPECIES.forEach(sp=>{const st=state.dex[sp.id];if(st==="caught")caught++;if(st)seen++;
+    const cell=document.createElement("div");cell.className="mon"+(st?"":" ghost");
+    const c=document.createElement("canvas");c.width=56;c.height=56;cell.appendChild(c);
+    if(st)drawMon(c,sp,false,0);else{const cx=c.getContext("2d");cx.fillStyle="#1b2740";cx.beginPath();cx.arc(28,28,16,0,7);cx.fill();}
+    const nm=document.createElement("div");nm.className="mn";nm.textContent=st?sp.name:"???";cell.appendChild(nm);
+    const mt=document.createElement("div");mt.className="mt";mt.textContent=st?(sp.tier+" · "+sp.aspect):"unseen";cell.appendChild(mt);
+    g.appendChild(cell);});
+  $("dexCount").textContent=caught;$("dexSeen").textContent=seen;
+}
+$("dexToggle").onclick=()=>{const p=$("dexPanel");const open=p.style.display==="none";
+  p.style.display=open?"block":"none";$("dexToggle").textContent=open?"Close Dex ▴":"Open Dex ▾";if(open)renderDex();};
+
+const KMAP={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",w:"up",s:"down",a:"left",d:"right"};
+addEventListener("keydown",e=>{const k=KMAP[e.key];if(k){keys[k]=1;e.preventDefault();}});
+addEventListener("keyup",e=>{const k=KMAP[e.key];if(k)keys[k]=0;});
+document.querySelectorAll(".dpad button").forEach(b=>{const d=b.dataset.d;
+  const on=e=>{e.preventDefault();keys[d]=1;},off=e=>{e.preventDefault();keys[d]=0;};
+  b.addEventListener("pointerdown",on);b.addEventListener("pointerup",off);
+  b.addEventListener("pointerleave",off);b.addEventListener("pointercancel",off);});
+
+world.addEventListener("pointerdown",e=>{if(battle)return;const r=world.getBoundingClientRect();
+  const tx=(e.clientX-r.left)*world.width/r.width,ty=(e.clientY-r.top)*world.height/r.height;
+  const iv=setInterval(()=>{const dx=tx-player.x,dy=ty-player.y,d=Math.hypot(dx,dy);
+    if(d<6||battle){clearInterval(iv);return;}player.x+=dx/d*2.4;player.y+=dy/d*2.4;},16);
+  setTimeout(()=>clearInterval(iv),1200);});
+
+syncLead();renderDex();requestAnimationFrame(step);
+</script>
