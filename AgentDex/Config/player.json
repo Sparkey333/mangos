@@ -1,0 +1,6 @@
+{
+  "handle": "Conductor",
+  "bio": "Runs a lot of agents across a lot of projects. Ships fast, sleeps occasionally, narrates bugs to the void.",
+  "startingAspect": "flux",
+  "traits": ["dry humor", "ships fast", "names everything"]
+}
